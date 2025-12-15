@@ -608,7 +608,13 @@
     <!-- Flappy Game -->
     <div id="flappy-game">
         <button id="back-btn" onclick="exitFlappyGame()">← Quay lại</button>
-        <button id="show-leaderboard-btn" onclick="showLeaderboard()">🏆 Bảng xếp hạng</button>
+        <button id="show-leaderboard-btn" onclick="showLeaderboard()">🏆 BXH</button>
+        <button id="change-name-btn" onclick="changeName()"
+            style="position:absolute;top:15px;right:180px;background:rgba(0,0,0,0.7);border:1px solid #ff69b4;color:#ff69b4;padding:10px 15px;border-radius:10px;cursor:pointer;z-index:202;">✏️
+            Đổi tên</button>
+        <div id="player-name-display"
+            style="position:absolute;top:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:8px 20px;border-radius:15px;color:#ff69b4;z-index:202;font-size:14px;">
+            👤 <span id="current-player-name">...</span></div>
         <div id="flappy-score">0</div>
         <canvas id="flappy-canvas"></canvas>
         <div id="flappy-instructions">
@@ -670,7 +676,18 @@
                 playerName = name;
                 localStorage.setItem('playerName', name);
                 document.getElementById('name-modal').style.display = 'none';
+                updatePlayerNameDisplay();
             }
+        }
+
+        function changeName() {
+            document.getElementById('player-name-input').value = playerName;
+            document.getElementById('name-modal').style.display = 'block';
+        }
+
+        function updatePlayerNameDisplay() {
+            const el = document.getElementById('current-player-name');
+            if (el) el.textContent = playerName || 'Chưa đặt tên';
         }
 
         // Leaderboard functions
@@ -1016,7 +1033,8 @@
             initFlappyCanvas();
             resetFlappyGame();
             flappyGameLoop();
-            // Ask for player name if not set
+            // Show player name and ask if not set
+            updatePlayerNameDisplay();
             askPlayerName();
         }
 
