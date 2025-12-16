@@ -2664,14 +2664,27 @@
                 themeTransition = Math.max(0, themeTransition - 0.02);
             }
 
+            // MUSIC BEAT FLASH - intense glow on beats
+            const musicPulse = (musicSyncEnabled && typeof beatIntensity !== 'undefined') ? beatIntensity : 0;
+            if (musicPulse > 0.3) {
+                const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
+                flashGrad.addColorStop(0, `rgba(255, 20, 147, ${musicPulse * 0.4})`);
+                flashGrad.addColorStop(0.5, `rgba(138, 43, 226, ${musicPulse * 0.2})`);
+                flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = flashGrad;
+                ctx.fillRect(0, 0, w, h);
+            }
+
             // Stars with twinkle
             const time = Date.now() / 1000;
             stars.forEach(s => {
-                const brightness = 0.5 + Math.sin(time * 3 + s.twinkle) * 0.5;
+                const baseBright = 0.5 + Math.sin(time * 3 + s.twinkle) * 0.5;
+                const brightness = baseBright + musicPulse * 0.5; // Stars pulse brighter with beat
+                const starSize = s.size * (1 + musicPulse * 0.8); // Stars grow on beat
                 ctx.beginPath();
                 const sx = ((s.x - bgScrollX * 0.05) % (w + 50) + w + 50) % (w + 50);
-                ctx.arc(sx, s.y, s.size, 0, Math.PI * 2);
-                ctx.fillStyle = currentTheme === 'space' ? `rgba(255, 255, 255, ${brightness})` : `rgba(255, 200, 220, ${brightness * 0.7})`;
+                ctx.arc(sx, s.y, starSize, 0, Math.PI * 2);
+                ctx.fillStyle = currentTheme === 'space' ? `rgba(255, 255, 255, ${Math.min(1, brightness)})` : `rgba(255, 200, 220, ${Math.min(1, brightness * 0.7)})`;
                 ctx.fill();
             });
 
@@ -2809,11 +2822,13 @@
                 }
             }
 
-            // Floating objects
+            // Floating objects - react to music beat
             floatingObjs.forEach(obj => {
                 const ox = ((obj.x - bgScrollX * obj.speed * 0.5) % (w + 200) + w + 200) % (w + 200) - 100;
-                const oy = obj.y + Math.sin(time * 2 + obj.wobble) * 15;
-                ctx.font = obj.size + 'px serif';
+                const beatWobble = musicPulse * 30; // Extra wobble on beat
+                const oy = obj.y + Math.sin(time * 2 + obj.wobble) * (15 + beatWobble);
+                const beatSize = obj.size * (1 + musicPulse * 0.5); // Objects grow on beat
+                ctx.font = beatSize + 'px serif';
                 ctx.fillText(obj.type, ox, oy);
             });
 
