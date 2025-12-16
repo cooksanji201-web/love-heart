@@ -1357,6 +1357,15 @@
             <p>Tránh các cột và vật cản để ghi điểm!</p>
             <p style="margin-top:10px;color:#00ff7f;">💚 Ăn power-ups để nhận buff</p>
             <p style="color:#ff4444;">❌ Tránh obstacles nguy hiểm</p>
+            <div style="margin-top:15px;display:flex;gap:10px;justify-content:center;">
+                <button id="mode-normal-btn" onclick="setGameMode('normal')"
+                    style="padding:8px 16px;border-radius:20px;border:2px solid #ff69b4;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-weight:bold;">🎮
+                    Thường</button>
+                <button id="mode-music-btn" onclick="setGameMode('music')"
+                    style="padding:8px 16px;border-radius:20px;border:2px solid #00ff7f;background:transparent;color:#aaa;cursor:pointer;font-weight:bold;">🎵
+                    Nhịp Nhạc</button>
+            </div>
+            <p id="mode-desc" style="margin-top:10px;font-size:12px;color:#888;">Chế độ thường - không sync nhạc</p>
             <p style="margin-top: 20px; color: #ffd700;">Nhấn để bắt đầu...</p>
         </div>
         <div id="game-over-screen">
@@ -1596,6 +1605,81 @@
         function spotifyPrev() { if (spotifyPlayer) spotifyPlayer.previousTrack(); }
         function spotifyNext() { if (spotifyPlayer) spotifyPlayer.nextTrack(); }
         function spotifySetVolume(val) { if (spotifyPlayer) spotifyPlayer.setVolume(val / 100); }
+
+        // Audio Analysis for Beat Sync
+        let currentTrackId = null;
+        let audioAnalysis = null;
+        let beats = [];
+        let currentBeatIndex = 0;
+        let beatIntensity = 0; // 0-1 value for visual effects
+        let lastBeatTime = 0;
+
+        async function fetchAudioAnalysis(trackId) {
+            if (!spotifyToken || trackId === currentTrackId) return;
+            currentTrackId = trackId;
+            try {
+                const response = await fetch(`https://api.spotify.com/v1/audio-analysis/${trackId}`, {
+                    headers: { 'Authorization': `Bearer ${spotifyToken}` }
+                });
+                if (response.ok) {
+                    audioAnalysis = await response.json();
+                    beats = audioAnalysis.beats || [];
+                    currentBeatIndex = 0;
+                    console.log(`🎵 Loaded ${beats.length} beats for track`);
+                }
+            } catch (e) {
+                console.log('Audio analysis not available:', e);
+            }
+        }
+
+        function updateBeatSync(positionMs) {
+            if (!beats.length || !spotifyIsPlaying) {
+                beatIntensity *= 0.9; // Fade out
+                return;
+            }
+            const positionSec = positionMs / 1000;
+
+            // Find current beat
+            while (currentBeatIndex < beats.length - 1 && beats[currentBeatIndex + 1].start < positionSec) {
+                currentBeatIndex++;
+            }
+
+            if (currentBeatIndex < beats.length) {
+                const beat = beats[currentBeatIndex];
+                const timeSinceBeat = positionSec - beat.start;
+                const beatDuration = beat.duration || 0.5;
+
+                // Create pulse effect: sharp rise, gradual fall
+                if (timeSinceBeat < beatDuration * 0.3) {
+                    beatIntensity = Math.min(1, beat.confidence * 1.5);
+                    lastBeatTime = Date.now();
+                } else {
+                    beatIntensity *= 0.85; // Decay
+                }
+            }
+        }
+
+        // Override updateSpotifyUI to include beat sync
+        const originalUpdateSpotifyUI = updateSpotifyUI;
+        function updateSpotifyUI(state) {
+            const track = state.track_window.current_track;
+            spotifyIsPlaying = !state.paused;
+            document.getElementById('spotify-track-name').textContent = track.name;
+            document.getElementById('spotify-artist-name').textContent = track.artists.map(a => a.name).join(', ');
+            document.getElementById('spotify-album-art').src = track.album.images[0]?.url || '';
+            document.getElementById('spotify-play').textContent = spotifyIsPlaying ? '⏸' : '▶';
+            document.getElementById('spotify-current-time').textContent = formatTime(state.position);
+            document.getElementById('spotify-duration').textContent = formatTime(state.duration);
+            document.getElementById('spotify-progress').value = (state.position / state.duration) * 100;
+
+            // Fetch audio analysis for new track
+            if (track.id !== currentTrackId) {
+                fetchAudioAnalysis(track.id);
+            }
+
+            // Update beat sync
+            updateBeatSync(state.position);
+        }
 
         function toggleSpotifyPlayer() {
             const player = document.getElementById('spotify-player');
@@ -1844,22 +1928,28 @@
             for (let i = 0; i < pos.length; i++) pos[i] += (targets[i] - pos[i]) * speed;
             group.geometry.attributes.position.needsUpdate = true;
             const count = pos.length / 3;
+            // Beat intensity from Spotify audio analysis
+            const musicPulse = (typeof beatIntensity !== 'undefined') ? beatIntensity : 0;
             if (state === 'HEART' || state === 'CODE_HEART') {
                 group.rotation.y += (rotY - group.rotation.y) * 0.1;
                 tiltAngle += (targetTilt - tiltAngle) * 0.1;
                 group.rotation.x = tiltAngle * Math.PI / 180;
                 const beat = 1 + Math.abs(Math.sin(time * 3)) * 0.15;
-                group.scale.set(beat, beat, beat);
+                const musicScale = 1 + musicPulse * 0.3;
+                group.scale.set(beat * musicScale, beat * musicScale, beat * musicScale);
             } else if (state === 'SPIRAL') {
                 group.rotation.y += 0.01;
-                group.scale.set(1, 1, 1);
+                const musicScale = 1 + musicPulse * 0.2;
+                group.scale.set(musicScale, musicScale, musicScale);
             } else {
                 group.rotation.y += (rotY - group.rotation.y) * 0.1;
-                group.scale.set(1, 1, 1);
+                const musicScale = 1 + musicPulse * 0.2;
+                group.scale.set(musicScale, musicScale, musicScale);
             }
             for (let i = 0; i < count; i++) {
-                const b = 0.7 + 0.5 * Math.sin(time * 5 + phases[i]);
-                col[i * 3] = b; col[i * 3 + 1] = 0.4 * b; col[i * 3 + 2] = 0.7 * b;
+                const baseBright = 0.7 + 0.5 * Math.sin(time * 5 + phases[i]);
+                const b = baseBright * (1 + musicPulse * 0.5);
+                col[i * 3] = Math.min(1, b); col[i * 3 + 1] = Math.min(1, 0.4 * b); col[i * 3 + 2] = Math.min(1, 0.7 * b);
             }
             group.geometry.attributes.color.needsUpdate = true;
         }
@@ -1978,6 +2068,30 @@
         const OBSTACLES = [
             { type: 'bomb', icon: '💣', color: '#ff4444', rarity: 20 }
         ];
+
+        // Music sync mode toggle
+        let musicSyncEnabled = false;
+        function setGameMode(mode) {
+            musicSyncEnabled = (mode === 'music');
+            const normalBtn = document.getElementById('mode-normal-btn');
+            const musicBtn = document.getElementById('mode-music-btn');
+            const modeDesc = document.getElementById('mode-desc');
+            if (musicSyncEnabled) {
+                musicBtn.style.background = 'linear-gradient(135deg,#00ff7f,#00bfff)';
+                musicBtn.style.color = 'white';
+                normalBtn.style.background = 'transparent';
+                normalBtn.style.color = '#aaa';
+                modeDesc.textContent = '🎵 Nhịp Nhạc - ống và tốc độ sync theo beat Spotify!';
+                modeDesc.style.color = '#00ff7f';
+            } else {
+                normalBtn.style.background = 'linear-gradient(135deg,#ff1493,#8a2be2)';
+                normalBtn.style.color = 'white';
+                musicBtn.style.background = 'transparent';
+                musicBtn.style.color = '#aaa';
+                modeDesc.textContent = 'Chế độ thường - không sync nhạc';
+                modeDesc.style.color = '#888';
+            }
+        }
 
         // Dynamic game settings based on level
         function getGameSettings() {
@@ -2302,8 +2416,9 @@
         function updateFlappy() {
             if (!flappyRunning) return;
             const settings = getGameSettings();
-            // Simplified: only shield and heart items remain, no speed/size modifiers
-            const speedMult = 1;
+            // Music beat sync - only when enabled
+            const musicPulse = (musicSyncEnabled && typeof beatIntensity !== 'undefined') ? beatIntensity : 0;
+            const speedMult = 1 + musicPulse * 0.3;
             flappyBird.velocity += settings.gravity * speedMult;
             flappyBird.y += flappyBird.velocity * speedMult;
             flappyBird.radius = flappyBird.baseRadius;
@@ -2316,32 +2431,14 @@
                 const p = flappyPipes[i];
                 p.x -= settings.pipeSpeed * speedMult;
 
-                // Moving pipes oscillate up/down
+                // Pipes oscillate with music beat
+                p.musicOffset = Math.sin(Date.now() * 0.003 + p.x * 0.01) * musicPulse * 40;
+
+                // Moving pipes also oscillate their own pattern
                 if (p.isMoving) {
                     p.moveOffset += p.moveSpeed * p.moveDir;
                     if (Math.abs(p.moveOffset) > p.moveRange) {
                         p.moveDir *= -1;
-                    }
-                }
-
-                // Check spike collision
-                if (p.hasSpike && !p.spikeHit) {
-                    const spikeX = p.x + PIPE_WIDTH / 2;
-                    const spikeY = p.gapCenterY + (p.moveOffset || 0);
-                    const dx = flappyBird.x - spikeX;
-                    const dy = flappyBird.y - spikeY;
-                    if (Math.sqrt(dx * dx + dy * dy) < flappyBird.radius + 25) {
-                        p.spikeHit = true;
-                        if (activeEffects.shield) {
-                            activeEffects.shield = false;
-                            showItemPopup('🛡️ Chặn!', '#00ff7f', spikeX, spikeY);
-                            updateEffectsUI();
-                        } else {
-                            // Slow effect - reduce velocity
-                            activeEffects.slow = Date.now() + 2000;
-                            flappyBird.velocity *= 0.5;
-                            showItemPopup('🔻 Chậm!', '#ff6600', spikeX, spikeY);
-                        }
                     }
                 }
 
@@ -2722,8 +2819,8 @@
 
             // Pipes
             flappyPipes.forEach(p => {
-                // Apply move offset for moving pipes
-                const offset = p.moveOffset || 0;
+                // Apply move offset for moving pipes AND music beat offset
+                const offset = (p.moveOffset || 0) + (p.musicOffset || 0);
                 const topH = p.topHeight + offset;
                 const bottomY = p.bottomY + offset;
 
@@ -2747,31 +2844,6 @@
                 ctx.fillRect(p.x - 5, topH - 15, PIPE_WIDTH + 10, 15);
                 ctx.fillRect(p.x - 5, bottomY, PIPE_WIDTH + 10, 15);
 
-                // Draw spike in gap
-                if (p.hasSpike) {
-                    const spikeX = p.x + PIPE_WIDTH / 2;
-                    const spikeY = p.gapCenterY + offset;
-                    ctx.save();
-                    ctx.translate(spikeX, spikeY);
-                    ctx.rotate(time * 2);
-                    // Draw spiky star
-                    ctx.beginPath();
-                    for (let i = 0; i < 8; i++) {
-                        const angle = (i / 8) * Math.PI * 2;
-                        const r = i % 2 === 0 ? 20 : 10;
-                        const x = Math.cos(angle) * r;
-                        const y = Math.sin(angle) * r;
-                        if (i === 0) ctx.moveTo(x, y);
-                        else ctx.lineTo(x, y);
-                    }
-                    ctx.closePath();
-                    ctx.fillStyle = p.spikeHit ? '#666' : '#ff4444';
-                    ctx.fill();
-                    ctx.strokeStyle = '#ff0000';
-                    ctx.lineWidth = 2;
-                    ctx.stroke();
-                    ctx.restore();
-                }
             });
 
             // Draw Items (power-ups & obstacles) with SOFT CUTE effect
