@@ -2396,8 +2396,8 @@
                         showItemPopup('🛡️ Chặn!', '#00ff7f', s.x, s.y);
                         updateEffectsUI();
                     } else {
-                        // Slow effect - apply immediately
-                        flappyBird.velocity = Math.min(flappyBird.velocity, 1);
+                        // Slow effect - reduce velocity slightly (not harsh)
+                        flappyBird.velocity *= 0.7;
                         showItemPopup('🔻 Chậm!', '#ff6600', s.x, s.y);
                     }
                 }
