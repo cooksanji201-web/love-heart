@@ -440,139 +440,451 @@
             }
         }
 
-        /* Leaderboard */
+        /* Leaderboard - Professional Design */
         #leaderboard {
             position: fixed;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #ff1493;
-            border-radius: 20px;
-            padding: 25px;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: linear-gradient(135deg, rgba(20, 0, 30, 0.98), rgba(40, 0, 60, 0.95));
+            border: 2px solid transparent;
+            border-image: linear-gradient(135deg, #ff1493, #8a2be2, #ff69b4) 1;
+            border-radius: 25px;
+            padding: 30px;
             z-index: 300;
-            min-width: 320px;
+            min-width: 380px;
+            max-width: 90vw;
             display: none;
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+            box-shadow: 0 0 60px rgba(255, 20, 147, 0.4), inset 0 0 30px rgba(255, 105, 180, 0.1);
+            backdrop-filter: blur(20px);
+            animation: modalPop 0.4s ease forwards;
+        }
+
+        @keyframes modalPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
         }
 
         #leaderboard h3 {
-            color: #ff69b4;
+            color: transparent;
+            background: linear-gradient(90deg, #ffd700, #ff69b4, #ffd700);
+            background-clip: text;
+            -webkit-background-clip: text;
             text-align: center;
-            margin-bottom: 15px;
-            font-size: 22px;
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                filter: brightness(1);
+            }
+
+            50% {
+                filter: brightness(1.3);
+            }
         }
 
         #leaderboard-list {
             list-style: none;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-track {
+            background: rgba(255, 105, 180, 0.1);
+            border-radius: 3px;
+        }
+
+        #leaderboard-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(#ff1493, #8a2be2);
+            border-radius: 3px;
         }
 
         #leaderboard-list li {
             display: flex;
-            justify-content: space-between;
-            padding: 8px 12px;
-            margin: 5px 0;
-            background: rgba(255, 20, 147, 0.15);
-            border-radius: 8px;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: rgba(255, 20, 147, 0.1);
+            border-radius: 12px;
             color: #fff;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 105, 180, 0.2);
+        }
+
+        #leaderboard-list li:hover {
+            transform: translateX(5px);
+            background: rgba(255, 20, 147, 0.2);
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.3);
         }
 
         #leaderboard-list li:nth-child(1) {
-            background: linear-gradient(90deg, rgba(255, 215, 0, 0.3), rgba(255, 20, 147, 0.2));
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 20, 147, 0.15));
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            animation: goldGlow 2s infinite;
+        }
+
+        @keyframes goldGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+            }
         }
 
         #leaderboard-list li:nth-child(2) {
-            background: linear-gradient(90deg, rgba(192, 192, 192, 0.3), rgba(255, 20, 147, 0.2));
+            background: linear-gradient(90deg, rgba(192, 192, 192, 0.25), rgba(255, 20, 147, 0.15));
+            border: 1px solid rgba(192, 192, 192, 0.3);
         }
 
         #leaderboard-list li:nth-child(3) {
-            background: linear-gradient(90deg, rgba(205, 127, 50, 0.3), rgba(255, 20, 147, 0.2));
+            background: linear-gradient(90deg, rgba(205, 127, 50, 0.25), rgba(255, 20, 147, 0.15));
+            border: 1px solid rgba(205, 127, 50, 0.3);
         }
 
         .rank {
-            color: #ffd700;
-            font-weight: bold;
-            width: 30px;
+            font-size: 20px;
+            width: 40px;
+            text-align: center;
         }
 
         .player-name {
             flex: 1;
             color: #ff69b4;
+            font-weight: 500;
+            margin-left: 10px;
         }
 
         .player-score {
             color: #00ff7f;
             font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(0, 255, 127, 0.5);
         }
 
         #close-leaderboard {
             display: block;
-            margin: 15px auto 0;
-            background: #ff1493;
+            margin: 20px auto 0;
+            background: linear-gradient(135deg, #ff1493, #8a2be2);
             border: none;
             color: white;
-            padding: 10px 30px;
-            border-radius: 20px;
+            padding: 12px 40px;
+            border-radius: 25px;
             cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
         }
 
-        /* Name input modal */
+        #close-leaderboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 20, 147, 0.6);
+        }
+
+        /* Name input modal - Professional Design */
         #name-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            border: 2px solid #ff1493;
-            border-radius: 20px;
-            padding: 30px;
+            background: linear-gradient(135deg, rgba(20, 0, 30, 0.98), rgba(40, 0, 60, 0.95));
+            border: 2px solid transparent;
+            border-image: linear-gradient(135deg, #ff1493, #8a2be2) 1;
+            border-radius: 25px;
+            padding: 40px 50px;
             z-index: 350;
             text-align: center;
             display: none;
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.5);
+            box-shadow: 0 0 80px rgba(255, 20, 147, 0.5), inset 0 0 40px rgba(255, 105, 180, 0.1);
+            backdrop-filter: blur(20px);
+            animation: modalPop 0.4s ease forwards;
         }
 
         #name-modal h3 {
             color: #ff69b4;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            font-size: 26px;
         }
 
-        #player-name-input {
-            background: rgba(255, 20, 147, 0.2);
-            border: 1px solid #ff69b4;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            font-size: 16px;
-            width: 200px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        #submit-name {
-            background: #ff1493;
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            border-radius: 20px;
-            cursor: pointer;
+        #name-modal p {
+            color: rgba(255, 105, 180, 0.7);
+            margin-bottom: 25px;
             font-size: 14px;
         }
 
-        /* Leaderboard button in game */
+        .avatar-select {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .avatar-option {
+            font-size: 32px;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .avatar-option:hover,
+        .avatar-option.selected {
+            background: rgba(255, 20, 147, 0.3);
+            border-color: #ff1493;
+            transform: scale(1.2);
+        }
+
+        #player-name-input {
+            background: rgba(255, 20, 147, 0.15);
+            border: 2px solid rgba(255, 105, 180, 0.4);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            width: 250px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        #player-name-input:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.4);
+        }
+
+        #player-name-input::placeholder {
+            color: rgba(255, 105, 180, 0.5);
+        }
+
+        #submit-name {
+            background: linear-gradient(135deg, #ff1493, #c71585);
+            border: none;
+            color: white;
+            padding: 15px 50px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 25px rgba(255, 20, 147, 0.5);
+            font-family: inherit;
+        }
+
+        #submit-name:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 35px rgba(255, 20, 147, 0.7);
+        }
+
+        /* Game UI buttons */
         #show-leaderboard-btn {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            border: 1px solid #ff69b4;
-            color: #ff69b4;
-            padding: 10px 20px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.8), rgba(255, 20, 147, 0.8));
+            border: 1px solid rgba(255, 105, 180, 0.5);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
             cursor: pointer;
             z-index: 202;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
+        }
+
+        #show-leaderboard-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.5);
+        }
+
+        /* Level indicator */
+        #level-indicator {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 20, 147, 0.2));
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: #ffd700;
+            padding: 10px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 202;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        /* Game buttons - Professional styling */
+        #show-leaderboard-btn,
+        #change-name-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 202;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.9), rgba(75, 0, 130, 0.9));
+            border: 2px solid rgba(255, 105, 180, 0.6);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+            backdrop-filter: blur(5px);
+        }
+
+        #show-leaderboard-btn {
+            right: 80px;
+        }
+
+        #change-name-btn {
+            top: 15px;
+            right: 15px;
+            padding: 12px 15px;
+        }
+
+        #show-leaderboard-btn:hover,
+        #change-name-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.5);
+            border-color: #ff1493;
+        }
+
+        /* Player info bar - moved down to avoid overlap */
+        #player-info-bar {
+            position: absolute;
+            top: 60px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 202;
+        }
+
+        #player-info-bar>div {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 0, 60, 0.9));
+            padding: 10px 18px;
+            border-radius: 15px;
+            color: #ff69b4;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid rgba(255, 105, 180, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 105, 180, 0.1);
+        }
+
+        #player-lives-display {
+            color: #ff1493;
+        }
+
+        #player-best-display {
+            color: #ffd700;
+        }
+
+        /* Active effects display */
+        #active-effects {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 202;
+        }
+
+        .effect-badge {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: effectPulse 1s infinite;
+        }
+
+        @keyframes effectPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Level up notification */
+        #level-up-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 140, 0, 0.9));
+            color: white;
+            padding: 30px 60px;
+            border-radius: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            z-index: 500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        #level-up-toast.show {
+            animation: levelUpAnim 1.5s ease forwards;
+        }
+
+        @keyframes levelUpAnim {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+
+            20% {
+                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
+                opacity: 1;
+            }
+
+            40% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+
+            80% {
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(0.5) rotate(10deg);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -607,37 +919,52 @@
 
     <!-- Flappy Game -->
     <div id="flappy-game">
-        <button id="back-btn" onclick="exitFlappyGame()">← Quay lại</button>
+        <button id="back-btn" onclick="exitFlappyGame()">← Back</button>
+        <div id="level-indicator">Lv.<span id="current-level">1</span> <span id="theme-name">🌃</span></div>
         <button id="show-leaderboard-btn" onclick="showLeaderboard()">🏆 BXH</button>
-        <button id="change-name-btn" onclick="changeName()"
-            style="position:absolute;top:15px;right:180px;background:rgba(0,0,0,0.7);border:1px solid #ff69b4;color:#ff69b4;padding:10px 15px;border-radius:10px;cursor:pointer;z-index:202;">✏️
-            Đổi tên</button>
-        <div id="player-name-display"
-            style="position:absolute;top:15px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:8px 20px;border-radius:15px;color:#ff69b4;z-index:202;font-size:14px;">
-            👤 <span id="current-player-name">...</span></div>
+        <button id="change-name-btn" onclick="changeName()">✏️</button>
+        <div id="player-info-bar">
+            <div id="player-name-display">👤 <span id="current-player-name">...</span></div>
+            <div id="player-lives-display"><span id="player-lives">💖</span></div>
+            <div id="player-best-display">🏅<span id="player-best">0</span></div>
+        </div>
         <div id="flappy-score">0</div>
         <canvas id="flappy-canvas"></canvas>
+        <div id="active-effects"></div>
         <div id="flappy-instructions">
-            <h2>💖 Flappy Heart 💖</h2>
+            <h2>💖 Flappy Heart Pro 💖</h2>
             <p>Nhấn <b>SPACE</b> hoặc <b>CLICK</b> để bay</p>
-            <p>Tránh các cột để ghi điểm!</p>
+            <p>Tránh các cột và vật cản để ghi điểm!</p>
+            <p style="margin-top:10px;color:#00ff7f;">💚 Ăn power-ups để nhận buff</p>
+            <p style="color:#ff4444;">❌ Tránh obstacles nguy hiểm</p>
             <p style="margin-top: 20px; color: #ffd700;">Nhấn để bắt đầu...</p>
         </div>
         <div id="game-over-screen">
             <h2>💔 Game Over 💔</h2>
             <div id="final-score">0</div>
+            <div id="final-level" style="color:#ffd700;font-size:18px;margin:10px 0;">Level: 1</div>
             <div id="high-score">High Score: 0</div>
             <button onclick="restartFlappyGame()">🔄 Chơi lại</button>
-            <button onclick="showLeaderboard()" style="margin-top:10px; background:#8a2be2;">🏆 Xem BXH</button>
+            <button onclick="showLeaderboard()"
+                style="margin-top:10px; background:linear-gradient(135deg,#8a2be2,#4b0082);">🏆 Xem BXH</button>
         </div>
     </div>
+    <div id="level-up-toast">🎉 LEVEL UP! 🎉</div>
 
     <!-- Name Input Modal -->
     <div id="name-modal">
-        <h3>🎮 Nhập tên của bạn</h3>
-        <input type="text" id="player-name-input" placeholder="Tên..." maxlength="15">
+        <h3>🎮 Chào mừng đến Flappy Heart!</h3>
+        <p>Chọn avatar và nhập tên để lên bảng xếp hạng</p>
+        <div class="avatar-select">
+            <span class="avatar-option selected" data-avatar="💖" onclick="selectAvatar(this)">💖</span>
+            <span class="avatar-option" data-avatar="🦋" onclick="selectAvatar(this)">🦋</span>
+            <span class="avatar-option" data-avatar="🌟" onclick="selectAvatar(this)">🌟</span>
+            <span class="avatar-option" data-avatar="🔥" onclick="selectAvatar(this)">🔥</span>
+            <span class="avatar-option" data-avatar="👑" onclick="selectAvatar(this)">👑</span>
+        </div>
+        <input type="text" id="player-name-input" placeholder="Nhập tên của bạn..." maxlength="15">
         <br>
-        <button id="submit-name" onclick="submitPlayerName()">💖 Xác nhận</button>
+        <button id="submit-name" onclick="submitPlayerName()">🚀 Bắt đầu chơi!</button>
     </div>
 
     <!-- Leaderboard -->
@@ -661,8 +988,15 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Player name
+        // Player name and avatar
         let playerName = localStorage.getItem('playerName') || '';
+        let playerAvatar = localStorage.getItem('playerAvatar') || '💖';
+
+        function selectAvatar(el) {
+            document.querySelectorAll('.avatar-option').forEach(a => a.classList.remove('selected'));
+            el.classList.add('selected');
+            playerAvatar = el.dataset.avatar;
+        }
 
         function askPlayerName() {
             if (!playerName) {
@@ -675,6 +1009,7 @@
             if (name) {
                 playerName = name;
                 localStorage.setItem('playerName', name);
+                localStorage.setItem('playerAvatar', playerAvatar);
                 document.getElementById('name-modal').style.display = 'none';
                 updatePlayerNameDisplay();
             }
@@ -683,20 +1018,28 @@
         function changeName() {
             document.getElementById('player-name-input').value = playerName;
             document.getElementById('name-modal').style.display = 'block';
+            // Select current avatar
+            document.querySelectorAll('.avatar-option').forEach(a => {
+                a.classList.toggle('selected', a.dataset.avatar === playerAvatar);
+            });
         }
 
         function updatePlayerNameDisplay() {
             const el = document.getElementById('current-player-name');
-            if (el) el.textContent = playerName || 'Chưa đặt tên';
+            if (el) el.textContent = playerAvatar + ' ' + (playerName || 'Chưa đặt tên');
+            const bestEl = document.getElementById('player-best');
+            if (bestEl) bestEl.textContent = localStorage.getItem('flappyHS') || 0;
         }
 
         // Leaderboard functions
-        function saveScore(score) {
+        function saveScore(score, level) {
             if (!playerName || score <= 0) return;
             const scoreRef = database.ref('leaderboard').push();
             scoreRef.set({
                 name: playerName,
+                avatar: playerAvatar,
                 score: score,
+                level: level || 1,
                 timestamp: Date.now()
             });
         }
@@ -726,9 +1069,12 @@
                     list.innerHTML = '<li style="justify-content:center;color:#888;">Chưa có điểm</li>';
                     return;
                 }
+                const rankIcons = ['🥇', '🥈', '🥉'];
                 scores.forEach((item, i) => {
                     const li = document.createElement('li');
-                    li.innerHTML = `<span class="rank">#${i + 1}</span><span class="player-name">${item.name}</span><span class="player-score">${item.score}</span>`;
+                    const rankDisplay = i < 3 ? rankIcons[i] : `#${i + 1}`;
+                    const avatar = item.avatar || '💖';
+                    li.innerHTML = `<span class="rank">${rankDisplay}</span><span class="player-name">${avatar} ${item.name}</span><span class="player-score">${item.score}</span>`;
                     list.appendChild(li);
                 });
             });
@@ -1011,11 +1357,49 @@
             if (camera) { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); }
         });
 
-        // FLAPPY GAME
+        // FLAPPY GAME PRO
         let flappyCanvas, flappyCtx, flappyBird = { x: 100, y: 300, velocity: 0, radius: 25 };
         let flappyPipes = [], flappyScore = 0, flappyHighScore = localStorage.getItem('flappyHS') || 0;
         let flappyRunning = false, flappyStarted = false, flappyAnimId = null;
-        const GRAVITY = 0.35, JUMP = -8, PIPE_WIDTH = 70, PIPE_GAP = 220, PIPE_SPEED = 3;
+
+        // Level & Difficulty System
+        let currentLevel = 1, lastLevel = 0;
+        // 7 themes: city, forest, sakura, ocean, space, tet
+        const THEMES = ['city', 'forest', 'sakura', 'ocean', 'space', 'tet'];
+        let currentTheme = 'city';
+
+        // Power-ups & Items with RARITY (lower = rarer)
+        let gameItems = [], activeEffects = {};
+        let playerLives = 1; // Start with 1 life
+
+        // Items - EQUAL RARITY for variety
+        const POWERUPS = [
+            { type: 'double', icon: '⭐', color: '#ffd700', duration: 5000, rarity: 20 },
+            { type: 'slowmo', icon: '⏳', color: '#87ceeb', duration: 5000, rarity: 20 },
+            { type: 'shrink', icon: '💎', color: '#ff69b4', duration: 5000, rarity: 20 },
+            { type: 'shield', icon: '🛡️', color: '#00ff7f', duration: 0, rarity: 20 },
+            { type: 'heart', icon: '💖', color: '#ff1493', duration: 0, rarity: 15 }
+        ];
+        const OBSTACLES = [
+            { type: 'lightning', icon: '⚡', color: '#ffff00', rarity: 25 },  // Speed up
+            { type: 'bomb', icon: '💣', color: '#ff4444', rarity: 20 },       // Damage
+            { type: 'freeze', icon: '🥶', color: '#00ffff', rarity: 30 },     // Slow down heavily
+            { type: 'dizzy', icon: '😵', color: '#ff00ff', rarity: 25 }       // Invert controls
+        ];
+
+        // Dynamic game settings based on level
+        function getGameSettings() {
+            const l = currentLevel;
+            return {
+                gravity: 0.35 + Math.min(l * 0.01, 0.15),
+                jump: -8 + Math.min(l * 0.1, 1),
+                pipeSpeed: 2.5 + Math.min(l * 0.15, 2.5),
+                pipeGap: Math.max(240 - l * 4, 150),
+                spawnRate: Math.max(350 - l * 6, 250),
+                itemChance: Math.min(0.4 + l * 0.03, 0.7)  // Much higher item spawn rate
+            };
+        }
+        const PIPE_WIDTH = 70;
 
         function initFlappyCanvas() {
             flappyCanvas = document.getElementById('flappy-canvas');
@@ -1048,12 +1432,60 @@
         function exitFlappyGame() { setState('HEART'); }
 
         function resetFlappyGame() {
-            flappyBird = { x: 100, y: innerHeight / 2, velocity: 0, radius: 25 };
+            flappyBird = { x: 100, y: innerHeight / 2, velocity: 0, radius: 25, baseRadius: 25 };
             flappyPipes = []; flappyScore = 0; flappyRunning = false; flappyStarted = false;
+            currentLevel = 1; lastLevel = 0; currentTheme = 'city';
+            gameItems = []; activeEffects = {};
+            playerLives = 1;
+            lastGapY = 0;
+            pipeCounter = 0;
+            itemAlternator = true;
+            itemHistory = [];
             bgScrollX = 0;
             initFlappyBackground();
+            updateLevelUI();
+            updateLivesUI();
             document.getElementById('flappy-score').textContent = '0';
             document.getElementById('high-score').textContent = 'High Score: ' + flappyHighScore;
+            document.getElementById('active-effects').innerHTML = '';
+        }
+
+        function updateLevelUI() {
+            document.getElementById('current-level').textContent = currentLevel;
+            const themeNames = {
+                city: '🌃', forest: '🌲', sakura: '🌸',
+                ocean: '🌊', space: '🚀', tet: '🧧'
+            };
+            document.getElementById('theme-name').textContent = themeNames[currentTheme] || '🌃';
+        }
+
+        // Smooth theme transition overlay
+        let themeTransition = 0;
+        function triggerThemeTransition() {
+            themeTransition = 1;
+        }
+
+        function showLevelUp() {
+            const toast = document.getElementById('level-up-toast');
+            toast.textContent = `🎉 LEVEL ${currentLevel}! 🎉`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 1500);
+        }
+
+        function updateLevel() {
+            const newLevel = Math.floor(flappyScore / 5) + 1;
+            if (newLevel > currentLevel) {
+                currentLevel = newLevel;
+                // Change theme every 4 levels
+                const themeIndex = Math.min(Math.floor((currentLevel - 1) / 4), THEMES.length - 1);
+                if (THEMES[themeIndex] !== currentTheme) {
+                    currentTheme = THEMES[themeIndex];
+                    triggerThemeTransition();
+                    initFlappyBackground();
+                }
+                updateLevelUI();
+                showLevelUp();
+            }
         }
 
         // Background elements
@@ -1061,43 +1493,77 @@
         let buildings = [], stars = [], clouds = [], floatingObjs = [];
 
         function initFlappyBackground() {
-            // Buildings - 3 layers parallax
-            buildings = [];
-            for (let layer = 0; layer < 3; layer++) {
-                const count = 8 + layer * 3;
-                for (let i = 0; i < count; i++) {
-                    buildings.push({
-                        x: i * (innerWidth / count) * 1.5 + Math.random() * 50,
-                        width: 40 + Math.random() * 60 + layer * 20,
-                        height: 80 + Math.random() * 150 + layer * 50,
-                        layer: layer,
-                        windows: Math.floor(3 + Math.random() * 6),
-                        color: layer === 0 ? '#1a0025' : layer === 1 ? '#2a0040' : '#3a0055'
-                    });
+            buildings = []; stars = []; clouds = []; floatingObjs = [];
+
+            if (currentTheme === 'city') {
+                // City - Buildings with neon lights
+                for (let layer = 0; layer < 3; layer++) {
+                    const count = 8 + layer * 3;
+                    for (let i = 0; i < count; i++) {
+                        buildings.push({
+                            x: i * (innerWidth / count) * 1.5 + Math.random() * 50,
+                            width: 40 + Math.random() * 60 + layer * 20,
+                            height: 80 + Math.random() * 150 + layer * 50,
+                            layer, windows: Math.floor(3 + Math.random() * 6),
+                            color: layer === 0 ? '#1a0025' : layer === 1 ? '#2a0040' : '#3a0055'
+                        });
+                    }
                 }
-            }
-            // Stars
-            stars = [];
-            for (let i = 0; i < 80; i++) {
-                stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.6, size: 0.5 + Math.random() * 2, twinkle: Math.random() * Math.PI * 2 });
-            }
-            // Clouds
-            clouds = [];
-            for (let i = 0; i < 6; i++) {
-                clouds.push({ x: Math.random() * innerWidth * 1.5, y: 50 + Math.random() * 150, size: 30 + Math.random() * 50, speed: 0.3 + Math.random() * 0.5 });
-            }
-            // Floating objects (hearts, stars, roses, moons)
-            floatingObjs = [];
-            const objTypes = ['💖', '⭐', '🌹', '🌙', '💕', '✨', '🦋', '💫'];
-            for (let i = 0; i < 15; i++) {
-                floatingObjs.push({
-                    x: Math.random() * innerWidth * 2,
-                    y: 100 + Math.random() * (innerHeight - 300),
-                    type: objTypes[Math.floor(Math.random() * objTypes.length)],
-                    size: 15 + Math.random() * 20,
-                    speed: 1 + Math.random() * 2,
-                    wobble: Math.random() * Math.PI * 2
-                });
+                for (let i = 0; i < 80; i++) stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.6, size: 0.5 + Math.random() * 2, twinkle: Math.random() * Math.PI * 2 });
+                const cityObjs = ['💖', '⭐', '🌙', '✨', '💫'];
+                for (let i = 0; i < 12; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 100 + Math.random() * (innerHeight - 300), type: cityObjs[Math.floor(Math.random() * cityObjs.length)], size: 15 + Math.random() * 20, speed: 1 + Math.random() * 2, wobble: Math.random() * Math.PI * 2 });
+            } else if (currentTheme === 'forest') {
+                // Mystical Forest - Trees, fireflies, mushrooms
+                for (let layer = 0; layer < 3; layer++) {
+                    const count = 5 + layer * 2;
+                    for (let i = 0; i < count; i++) {
+                        buildings.push({ x: i * (innerWidth / count) * 1.5, width: 60 + Math.random() * 80, height: 100 + layer * 60 + Math.random() * 80, layer, isTree: true, color: layer === 0 ? '#0a1510' : layer === 1 ? '#122a1a' : '#1a4025' });
+                    }
+                }
+                for (let i = 0; i < 60; i++) stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.7, size: 1 + Math.random() * 2, twinkle: Math.random() * Math.PI * 2, isFirefly: true });
+                const forestObjs = ['🍄', '🌙', '🦋', '✨', '🌿', '🍃', '🦉'];
+                for (let i = 0; i < 15; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 100 + Math.random() * (innerHeight - 280), type: forestObjs[Math.floor(Math.random() * forestObjs.length)], size: 18 + Math.random() * 22, speed: 0.6 + Math.random() * 1.2, wobble: Math.random() * Math.PI * 2 });
+            } else if (currentTheme === 'sakura') {
+                // Cherry Blossom - Trees, falling petals, lanterns
+                for (let layer = 0; layer < 3; layer++) {
+                    const count = 4 + layer * 2;
+                    for (let i = 0; i < count; i++) {
+                        buildings.push({ x: i * (innerWidth / count) * 1.5, width: 50 + Math.random() * 70, height: 90 + layer * 50 + Math.random() * 60, layer, isSakuraTree: true, color: layer === 0 ? '#1a0820' : layer === 1 ? '#2a1030' : '#3a1545' });
+                    }
+                }
+                for (let i = 0; i < 50; i++) stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.8, size: 0.8 + Math.random() * 1.5, twinkle: Math.random() * Math.PI * 2 });
+                // Falling petals
+                for (let i = 0; i < 30; i++) clouds.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, size: 8 + Math.random() * 12, speed: 0.3 + Math.random() * 0.5, isPetal: true });
+                const sakuraObjs = ['🌸', '🏮', '🎋', '✨', '💮', '🌙', '🎐'];
+                for (let i = 0; i < 14; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 80 + Math.random() * (innerHeight - 250), type: sakuraObjs[Math.floor(Math.random() * sakuraObjs.length)], size: 18 + Math.random() * 25, speed: 0.7 + Math.random() * 1.3, wobble: Math.random() * Math.PI * 2 });
+            } else if (currentTheme === 'ocean') {
+                // Ocean - Coral, fish, bubbles
+                for (let layer = 0; layer < 3; layer++) {
+                    const count = 6 + layer * 2;
+                    for (let i = 0; i < count; i++) {
+                        buildings.push({ x: i * (innerWidth / count) * 1.5, width: 30 + Math.random() * 50, height: 50 + layer * 30 + Math.random() * 80, layer, isCoral: true, color: ['#ff6b6b', '#4ecdc4', '#ffe66d', '#6b5b95'][Math.floor(Math.random() * 4)] });
+                    }
+                }
+                for (let i = 0; i < 40; i++) clouds.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, size: 3 + Math.random() * 8, speed: 0.5 + Math.random(), isBubble: true });
+                const oceanObjs = ['🐠', '🐟', '🦀', '🐚', '🌊', '🐙', '🦑', '🐡'];
+                for (let i = 0; i < 15; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 80 + Math.random() * (innerHeight - 200), type: oceanObjs[Math.floor(Math.random() * oceanObjs.length)], size: 20 + Math.random() * 30, speed: 1 + Math.random() * 2, wobble: Math.random() * Math.PI * 2 });
+            } else if (currentTheme === 'space') {
+                // Space - Planets, nebula, asteroids
+                for (let i = 0; i < 150; i++) stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, size: 0.5 + Math.random() * 3, twinkle: Math.random() * Math.PI * 2 });
+                for (let i = 0; i < 4; i++) buildings.push({ x: Math.random() * innerWidth, y: 100 + Math.random() * (innerHeight - 300), width: 40 + Math.random() * 80, isPlanet: true, color: ['#ff6347', '#4169e1', '#9370db', '#ffd700'][i] });
+                const spaceObjs = ['🚀', '🛸', '☄️', '🌟', '💫', '🌍', '🌙'];
+                for (let i = 0; i < 12; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 80 + Math.random() * (innerHeight - 200), type: spaceObjs[Math.floor(Math.random() * spaceObjs.length)], size: 20 + Math.random() * 35, speed: 0.5 + Math.random() * 1.5, wobble: Math.random() * Math.PI * 2 });
+            } else if (currentTheme === 'tet') {
+                // Vietnamese Tet - Lanterns, mai flowers, fireworks
+                for (let layer = 0; layer < 3; layer++) {
+                    const count = 4 + layer * 2;
+                    for (let i = 0; i < count; i++) {
+                        buildings.push({ x: i * (innerWidth / count) * 1.5, width: 50 + Math.random() * 60, height: 80 + layer * 40 + Math.random() * 50, layer, isMaiTree: true, color: layer === 0 ? '#1a0505' : layer === 1 ? '#2a0a0a' : '#3a1010' });
+                    }
+                }
+                for (let i = 0; i < 60; i++) stars.push({ x: Math.random() * innerWidth, y: Math.random() * innerHeight * 0.7, size: 1 + Math.random() * 2, twinkle: Math.random() * Math.PI * 2, isFirework: true });
+                const tetObjs = ['🏮', '🧧', '🎆', '🌸', '✨', '🎋', '🐉', '💮'];
+                for (let i = 0; i < 16; i++) floatingObjs.push({ x: Math.random() * innerWidth * 2, y: 80 + Math.random() * (innerHeight - 250), type: tetObjs[Math.floor(Math.random() * tetObjs.length)], size: 20 + Math.random() * 28, speed: 0.6 + Math.random() * 1.4, wobble: Math.random() * Math.PI * 2 });
             }
         }
 
@@ -1109,39 +1575,291 @@
 
         function flappyJump() {
             if (!flappyStarted) { flappyStarted = true; flappyRunning = true; document.getElementById('flappy-instructions').style.display = 'none'; }
-            if (flappyRunning) flappyBird.velocity = JUMP;
+            if (flappyRunning) {
+                const settings = getGameSettings();
+                flappyBird.velocity = settings.jump;
+            }
         }
 
         document.getElementById('flappy-game').onclick = e => { if (e.target.tagName !== 'BUTTON') flappyJump(); };
 
+        let lastPipeX = 0, lastGapY = 0;
+        let pipeCounter = 0, itemAlternator = true;
+        let itemHistory = []; // Track last 4 items to prevent repeats
+
         function createPipe() {
-            const topH = 60 + Math.random() * (innerHeight - PIPE_GAP - 120);
-            flappyPipes.push({ x: innerWidth, topHeight: topH, bottomY: topH + PIPE_GAP, passed: false });
+            const settings = getGameSettings();
+            const gap = settings.pipeGap;
+
+            // Smart gap positioning - limit vertical change
+            const minY = gap / 2 + 60;
+            const maxY = innerHeight - gap / 2 - 60;
+            let gapCenterY;
+
+            if (lastGapY === 0) {
+                gapCenterY = innerHeight / 2;
+            } else {
+                const maxChange = gap * 0.7;
+                gapCenterY = lastGapY + (Math.random() - 0.5) * 2 * maxChange;
+                gapCenterY = Math.max(minY, Math.min(maxY, gapCenterY));
+            }
+            lastGapY = gapCenterY;
+
+            const topH = gapCenterY - gap / 2;
+            const pipe = { x: innerWidth, topHeight: topH, bottomY: gapCenterY + gap / 2, gapCenterY, passed: false };
+            flappyPipes.push(pipe);
+
+            // Item spawn: every 2-3 pipes, difficulty progressive
+            pipeCounter++;
+            const spawnThreshold = pipeCounter % 2 === 0 ? 2 : 3;
+            if (pipeCounter >= spawnThreshold) {
+                pipeCounter = 0;
+
+                // Progressive difficulty using spawn counter for exact ratio
+                // Level 1-3: 3 good then 1 bad (75% good)
+                // Level 4-6: 2 good then 1 bad (66% good)
+                // Level 7-10: 1 good then 1 bad (50% good)
+                // Level 11+: 1 good then 2 bad (33% good)
+                itemAlternator++;
+                let isGood;
+                if (currentLevel <= 3) {
+                    isGood = (itemAlternator % 4) !== 0; // 3 good, 1 bad
+                } else if (currentLevel <= 6) {
+                    isGood = (itemAlternator % 3) !== 0; // 2 good, 1 bad
+                } else if (currentLevel <= 10) {
+                    isGood = (itemAlternator % 2) !== 0; // 1 good, 1 bad
+                } else {
+                    isGood = (itemAlternator % 3) === 1; // 1 good, 2 bad
+                }
+
+                // Select item avoiding last 4 used items
+                function selectWithNoRepeat(items) {
+                    const available = items.filter(item => !itemHistory.includes(item.type));
+                    const pool = available.length > 0 ? available : items;
+
+                    const totalWeight = pool.reduce((sum, item) => sum + item.rarity, 0);
+                    let random = Math.random() * totalWeight;
+                    for (const item of pool) {
+                        random -= item.rarity;
+                        if (random <= 0) {
+                            itemHistory.push(item.type);
+                            if (itemHistory.length > 5) itemHistory.shift(); // Wait 5 items before repeat
+                            return item;
+                        }
+                    }
+                    return pool[0];
+                }
+
+                if (isGood) {
+                    const powerup = selectWithNoRepeat(POWERUPS);
+                    gameItems.push({
+                        x: innerWidth + PIPE_WIDTH * 4, // Farther from pipe
+                        y: gapCenterY + (Math.random() - 0.5) * gap * 0.25,
+                        ...powerup, isGood: true, collected: false
+                    });
+                } else {
+                    const obstacle = selectWithNoRepeat(OBSTACLES);
+                    const atTop = Math.random() > 0.5;
+                    const obstacleY = atTop ?
+                        gapCenterY - gap * 0.35 - 15 - Math.random() * 30 :
+                        gapCenterY + gap * 0.35 + 15 + Math.random() * 30;
+                    gameItems.push({
+                        x: innerWidth + PIPE_WIDTH * 4, // Farther from pipe
+                        y: Math.max(50, Math.min(innerHeight - 50, obstacleY)),
+                        ...obstacle, isGood: false, collected: false
+                    });
+                }
+            }
         }
 
         function updateFlappy() {
             if (!flappyRunning) return;
-            flappyBird.velocity += GRAVITY;
-            flappyBird.y += flappyBird.velocity;
-            bgScrollX += 2;
-            if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length - 1].x < innerWidth - 350) createPipe();
+            const settings = getGameSettings();
+            const speedMult = activeEffects.slowmo ? 0.5 : (activeEffects.lightning ? 1.5 : 1);
+
+            flappyBird.velocity += settings.gravity * speedMult;
+            flappyBird.y += flappyBird.velocity * speedMult;
+            flappyBird.radius = activeEffects.shrink ? flappyBird.baseRadius * 0.6 : flappyBird.baseRadius;
+
+            bgScrollX += 2 * speedMult;
+
+            const spawnDist = Math.max(280, settings.spawnRate);
+            if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length - 1].x < innerWidth - spawnDist) createPipe();
+
             for (let i = flappyPipes.length - 1; i >= 0; i--) {
-                flappyPipes[i].x -= PIPE_SPEED;
+                flappyPipes[i].x -= settings.pipeSpeed * speedMult;
                 if (!flappyPipes[i].passed && flappyPipes[i].x + PIPE_WIDTH < flappyBird.x) {
                     flappyPipes[i].passed = true;
-                    flappyScore++;
+                    flappyScore += activeEffects.double ? 2 : 1;
                     document.getElementById('flappy-score').textContent = flappyScore;
+                    updateLevel();
                 }
                 if (flappyPipes[i].x < -PIPE_WIDTH) flappyPipes.splice(i, 1);
             }
+
+            // Update items
+            for (let i = gameItems.length - 1; i >= 0; i--) {
+                gameItems[i].x -= settings.pipeSpeed * speedMult;
+                if (gameItems[i].x < -50) { gameItems.splice(i, 1); continue; }
+                if (gameItems[i].collected) continue;
+
+                // Check collision with item
+                const dx = flappyBird.x - gameItems[i].x;
+                const dy = flappyBird.y - gameItems[i].y;
+                if (Math.sqrt(dx * dx + dy * dy) < flappyBird.radius + 20) {
+                    collectItem(gameItems[i]);
+                    gameItems[i].collected = true;
+                }
+            }
+
+            // Update effects
+            updateEffects();
             checkCollision();
         }
 
+        // Floating popup texts
+        let floatingTexts = [];
+
+        function showItemPopup(text, color, x, y) {
+            floatingTexts.push({ text, color, x, y, opacity: 1, birth: Date.now() });
+        }
+
+        function collectItem(item) {
+            const descriptions = {
+                shield: '🛡️ KHIÊN BẢO VỆ!',
+                slowmo: '⏳ CHẬM LẠI 5s!',
+                double: '⭐ ĐIỂM x2 trong 5s!',
+                shrink: '💎 THU NHỎ 5s!',
+                heart: '💖 +1 MẠNG!',
+                bomb: '💣 BOM!',
+                lightning: '⚡ TĂNG TỐC 3s!'
+            };
+
+            showItemPopup(descriptions[item.type] || item.type, item.color, item.x, item.y);
+
+            if (item.isGood) {
+                if (item.type === 'shield') {
+                    activeEffects.shield = true;
+                } else if (item.type === 'heart') {
+                    playerLives++;
+                    updateLivesUI();
+                } else {
+                    activeEffects[item.type] = Date.now() + item.duration;
+                }
+                updateEffectsUI();
+            } else {
+                // Bad items - shield blocks ALL bad items
+                if (activeEffects.shield) {
+                    activeEffects.shield = false;
+                    showItemPopup('🛡️ Chặn!', '#00ff7f', item.x, item.y);
+                    updateEffectsUI();
+                    return; // Shield blocked, don't apply bad effect
+                }
+
+                if (item.type === 'bomb') {
+                    if (playerLives > 1) {
+                        playerLives--;
+                        updateLivesUI();
+                        showItemPopup('💔 MẤT 1 MẠNG!', '#ff4444', item.x, item.y);
+                    } else {
+                        gameOver();
+                    }
+                } else if (item.type === 'lightning') {
+                    activeEffects.lightning = Date.now() + 3000;
+                    showItemPopup('⚡ TĂNG TỐC!', '#ffff00', item.x, item.y);
+                    updateEffectsUI();
+                } else if (item.type === 'freeze') {
+                    activeEffects.freeze = Date.now() + 3000;
+                    showItemPopup('🥶 ĐÓNG BĂNG!', '#00ffff', item.x, item.y);
+                    updateEffectsUI();
+                } else if (item.type === 'dizzy') {
+                    activeEffects.dizzy = Date.now() + 3000;
+                    showItemPopup('😵 CHÓNG MẶT!', '#ff00ff', item.x, item.y);
+                    updateEffectsUI();
+                }
+            }
+        }
+
+        function updateLivesUI() {
+            const livesEl = document.getElementById('player-lives');
+            if (livesEl) livesEl.textContent = '💖'.repeat(playerLives);
+        }
+
+        function updateEffects() {
+            const now = Date.now();
+            let changed = false;
+            for (const key of ['slowmo', 'double', 'shrink', 'lightning']) {
+                if (activeEffects[key] && activeEffects[key] < now) {
+                    delete activeEffects[key];
+                    changed = true;
+                }
+            }
+            if (changed) updateEffectsUI();
+        }
+
+        function updateEffectsUI() {
+            const container = document.getElementById('active-effects');
+            container.innerHTML = '';
+            if (activeEffects.shield) {
+                container.innerHTML += '<div class="effect-badge" style="border-color:#00ff7f;color:#00ff7f;">🛡️ Shield</div>';
+            }
+            for (const [key, endTime] of Object.entries(activeEffects)) {
+                if (key === 'shield') continue;
+                const remaining = Math.ceil((endTime - Date.now()) / 1000);
+                if (remaining > 0) {
+                    const icons = { slowmo: '⏳', double: '⭐', shrink: '💎', lightning: '⚡' };
+                    const colors = { slowmo: '#87ceeb', double: '#ffd700', shrink: '#ff69b4', lightning: '#ffff00' };
+                    container.innerHTML += `<div class="effect-badge" style="border-color:${colors[key]};color:${colors[key]};">${icons[key]} ${remaining}s</div>`;
+                }
+            }
+        }
+
         function checkCollision() {
-            if (flappyBird.y - flappyBird.radius < 0 || flappyBird.y + flappyBird.radius > innerHeight) { gameOver(); return; }
+            // Check ground/ceiling collision
+            if (flappyBird.y - flappyBird.radius < 0 || flappyBird.y + flappyBird.radius > innerHeight) {
+                if (activeEffects.shield) {
+                    activeEffects.shield = false;
+                    updateEffectsUI();
+                    showItemPopup('🛡️ SHIELD CHẶN!', '#00ff7f', flappyBird.x, flappyBird.y);
+                    flappyBird.y = Math.max(flappyBird.radius + 10, Math.min(innerHeight - flappyBird.radius - 10, flappyBird.y));
+                    flappyBird.velocity = 0;
+                    return;
+                }
+                if (playerLives > 1) {
+                    playerLives--;
+                    updateLivesUI();
+                    showItemPopup('💔 MẤT 1 MẠNG!', '#ff4444', flappyBird.x, flappyBird.y);
+                    flappyBird.y = innerHeight / 2;
+                    flappyBird.velocity = 0;
+                    return;
+                }
+                gameOver();
+                return;
+            }
+
+            // Check pipe collision
             for (let p of flappyPipes) {
                 if (flappyBird.x + flappyBird.radius > p.x && flappyBird.x - flappyBird.radius < p.x + PIPE_WIDTH) {
-                    if (flappyBird.y - flappyBird.radius < p.topHeight || flappyBird.y + flappyBird.radius > p.bottomY) { gameOver(); return; }
+                    if (flappyBird.y - flappyBird.radius < p.topHeight || flappyBird.y + flappyBird.radius > p.bottomY) {
+                        if (activeEffects.shield) {
+                            activeEffects.shield = false;
+                            updateEffectsUI();
+                            showItemPopup('🛡️ SHIELD CHẶN!', '#00ff7f', flappyBird.x, flappyBird.y);
+                            return;
+                        }
+                        if (playerLives > 1) {
+                            playerLives--;
+                            updateLivesUI();
+                            showItemPopup('💔 MẤT 1 MẠNG!', '#ff4444', flappyBird.x, flappyBird.y);
+                            // Reset position to just past this pipe
+                            flappyBird.x = p.x + PIPE_WIDTH + flappyBird.radius + 10;
+                            flappyBird.y = p.gapCenterY;
+                            flappyBird.velocity = 0;
+                            return;
+                        }
+                        gameOver();
+                        return;
+                    }
                 }
             }
         }
@@ -1150,87 +1868,191 @@
             flappyRunning = false;
             if (flappyScore > flappyHighScore) { flappyHighScore = flappyScore; localStorage.setItem('flappyHS', flappyHighScore); }
             document.getElementById('final-score').textContent = flappyScore;
+            document.getElementById('final-level').textContent = 'Level: ' + currentLevel;
             document.getElementById('high-score').textContent = 'High Score: ' + flappyHighScore;
             document.getElementById('game-over-screen').style.display = 'block';
-            // Save score to Firebase
-            saveScore(flappyScore);
+            saveScore(flappyScore, currentLevel);
+            updatePlayerNameDisplay();
         }
 
         function drawFlappy() {
             const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
             ctx.clearRect(0, 0, w, h);
 
-            // Sky gradient
+            // Sky gradient - ALL THEMES use dark purple base for consistency
             const sky = ctx.createLinearGradient(0, 0, 0, h);
-            sky.addColorStop(0, '#0a0018'); sky.addColorStop(0.4, '#1a0035'); sky.addColorStop(0.7, '#2d0050'); sky.addColorStop(1, '#3a0060');
+            if (currentTheme === 'city') {
+                // Dark purple with pink glow
+                sky.addColorStop(0, '#0a0018'); sky.addColorStop(0.4, '#1a0035'); sky.addColorStop(0.7, '#2d0050'); sky.addColorStop(1, '#3a0060');
+            } else if (currentTheme === 'forest') {
+                // Dark purple with green hints - mystical forest
+                sky.addColorStop(0, '#0a0818'); sky.addColorStop(0.4, '#12102a'); sky.addColorStop(0.7, '#1a1538'); sky.addColorStop(1, '#221a45');
+            } else if (currentTheme === 'sakura') {
+                // Dark magenta-purple cherry blossom
+                sky.addColorStop(0, '#100818'); sky.addColorStop(0.4, '#180d20'); sky.addColorStop(0.7, '#201228'); sky.addColorStop(1, '#281535');
+            } else if (currentTheme === 'ocean') {
+                // Dark blue-purple underwater
+                sky.addColorStop(0, '#050515'); sky.addColorStop(0.4, '#0a1025'); sky.addColorStop(0.7, '#101530'); sky.addColorStop(1, '#152040');
+            } else if (currentTheme === 'space') {
+                // Deep dark space
+                sky.addColorStop(0, '#020008'); sky.addColorStop(0.4, '#080015'); sky.addColorStop(0.7, '#0c0020'); sky.addColorStop(1, '#12002a');
+            } else if (currentTheme === 'tet') {
+                // Dark red-crimson Vietnamese Tet
+                sky.addColorStop(0, '#150808'); sky.addColorStop(0.4, '#1f0c0c'); sky.addColorStop(0.7, '#2a1010'); sky.addColorStop(1, '#351515');
+            }
             ctx.fillStyle = sky;
             ctx.fillRect(0, 0, w, h);
+
+            // Smooth theme transition fade effect - softer pink glow
+            if (themeTransition > 0) {
+                ctx.fillStyle = `rgba(255, 150, 200, ${themeTransition * 0.25})`;
+                ctx.fillRect(0, 0, w, h);
+                themeTransition = Math.max(0, themeTransition - 0.02);
+            }
 
             // Stars with twinkle
             const time = Date.now() / 1000;
             stars.forEach(s => {
                 const brightness = 0.5 + Math.sin(time * 3 + s.twinkle) * 0.5;
                 ctx.beginPath();
-                ctx.arc((s.x - bgScrollX * 0.05) % (w + 50), s.y, s.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 200, 220, ${brightness})`;
+                const sx = ((s.x - bgScrollX * 0.05) % (w + 50) + w + 50) % (w + 50);
+                ctx.arc(sx, s.y, s.size, 0, Math.PI * 2);
+                ctx.fillStyle = currentTheme === 'space' ? `rgba(255, 255, 255, ${brightness})` : `rgba(255, 200, 220, ${brightness * 0.7})`;
                 ctx.fill();
             });
 
-            // Clouds
+            // Clouds or Bubbles
             clouds.forEach(c => {
                 const cx = ((c.x - bgScrollX * c.speed * 0.3) % (w + 200) + w + 200) % (w + 200) - 100;
-                ctx.beginPath();
-                ctx.arc(cx, c.y, c.size, 0, Math.PI * 2);
-                ctx.arc(cx + c.size * 0.6, c.y - c.size * 0.2, c.size * 0.7, 0, Math.PI * 2);
-                ctx.arc(cx - c.size * 0.5, c.y + c.size * 0.1, c.size * 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(80, 40, 100, 0.3)';
-                ctx.fill();
+                if (c.isBubble) {
+                    // Ocean bubbles
+                    ctx.beginPath();
+                    ctx.arc(cx, (c.y - bgScrollX * 0.2) % h, c.size, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(cx, c.y, c.size, 0, Math.PI * 2);
+                    ctx.arc(cx + c.size * 0.6, c.y - c.size * 0.2, c.size * 0.7, 0, Math.PI * 2);
+                    ctx.arc(cx - c.size * 0.5, c.y + c.size * 0.1, c.size * 0.6, 0, Math.PI * 2);
+                    ctx.fillStyle = currentTheme === 'countryside' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(80, 40, 100, 0.3)';
+                    ctx.fill();
+                }
             });
 
-            // Buildings (3 layers parallax)
-            for (let layer = 0; layer < 3; layer++) {
-                const speedMult = 0.2 + layer * 0.3;
-                buildings.filter(b => b.layer === layer).forEach(b => {
-                    const bx = ((b.x - bgScrollX * speedMult) % (w * 1.5) + w * 1.5) % (w * 1.5) - w * 0.25;
-                    const by = h - b.height;
-
-                    // Building body
-                    ctx.fillStyle = b.color;
-                    ctx.fillRect(bx, by, b.width, b.height);
-
-                    // Building outline glow
-                    ctx.strokeStyle = `rgba(255, 105, 180, ${0.1 + layer * 0.1})`;
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(bx, by, b.width, b.height);
-
-                    // Windows
-                    const winW = 6, winH = 10, winGap = 18;
-                    for (let row = 0; row < Math.min(b.windows, Math.floor((b.height - 20) / winGap)); row++) {
-                        for (let col = 0; col < 3; col++) {
-                            const wx = bx + 8 + col * (b.width - 20) / 3;
-                            const wy = by + 12 + row * winGap;
-                            const lit = Math.sin(b.x + row * 5 + col * 7 + time) > 0.3;
-                            ctx.fillStyle = lit ? `rgba(255, 200, 100, ${0.4 + layer * 0.2})` : 'rgba(20, 10, 30, 0.8)';
-                            ctx.fillRect(wx, wy, winW, winH);
-                        }
-                    }
-
-                    // Rooftop antenna for tall buildings
-                    if (b.height > 180) {
-                        ctx.strokeStyle = 'rgba(255, 105, 180, 0.4)';
-                        ctx.lineWidth = 2;
-                        ctx.beginPath();
-                        ctx.moveTo(bx + b.width / 2, by);
-                        ctx.lineTo(bx + b.width / 2, by - 15);
-                        ctx.stroke();
-                        if (Math.sin(time * 4) > 0) {
-                            ctx.beginPath();
-                            ctx.arc(bx + b.width / 2, by - 15, 3, 0, Math.PI * 2);
-                            ctx.fillStyle = '#ff1493';
-                            ctx.fill();
-                        }
+            // Draw theme elements (Buildings/Hills/Coral/Planets)
+            if (currentTheme === 'space') {
+                // Draw planets
+                buildings.forEach(p => {
+                    if (!p.isPlanet) return;
+                    const px = ((p.x - bgScrollX * 0.1) % (w + 100) + w + 100) % (w + 100);
+                    ctx.beginPath();
+                    ctx.arc(px, p.y, p.width / 2, 0, Math.PI * 2);
+                    const pGrad = ctx.createRadialGradient(px - p.width / 4, p.y - p.width / 4, 0, px, p.y, p.width / 2);
+                    pGrad.addColorStop(0, '#ffffff40'); pGrad.addColorStop(0.3, p.color); pGrad.addColorStop(1, '#00000080');
+                    ctx.fillStyle = pGrad;
+                    ctx.fill();
+                    // Ring for some planets
+                    if (p.color === '#ffd700') {
+                        ctx.beginPath(); ctx.ellipse(px, p.y, p.width * 0.8, p.width * 0.2, 0.3, 0, Math.PI * 2);
+                        ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)'; ctx.lineWidth = 3; ctx.stroke();
                     }
                 });
+            } else {
+                for (let layer = 0; layer < 3; layer++) {
+                    const speedMult = 0.2 + layer * 0.3;
+                    buildings.filter(b => b.layer === layer).forEach(b => {
+                        const bx = ((b.x - bgScrollX * speedMult) % (w * 1.5) + w * 1.5) % (w * 1.5) - w * 0.25;
+                        const by = h - b.height;
+
+                        if (b.isHill) {
+                            // Countryside hills
+                            ctx.beginPath();
+                            ctx.moveTo(bx - b.width / 2, h);
+                            ctx.quadraticCurveTo(bx + b.width / 2, by - b.height * 0.3, bx + b.width * 1.5, h);
+                            ctx.fillStyle = b.color;
+                            ctx.fill();
+                        } else if (b.isTree) {
+                            // Forest pine trees
+                            ctx.fillStyle = b.color;
+                            // Trunk
+                            ctx.fillRect(bx + b.width * 0.4, by + b.height * 0.6, b.width * 0.2, b.height * 0.4);
+                            // Tree layers
+                            for (let t = 0; t < 3; t++) {
+                                ctx.beginPath();
+                                const ty = by + t * b.height * 0.25;
+                                const tw = b.width * (1 - t * 0.2);
+                                ctx.moveTo(bx + b.width / 2, ty);
+                                ctx.lineTo(bx + b.width / 2 - tw / 2, ty + b.height * 0.35);
+                                ctx.lineTo(bx + b.width / 2 + tw / 2, ty + b.height * 0.35);
+                                ctx.closePath();
+                                ctx.fillStyle = `rgba(30, ${80 + layer * 30}, 40, ${0.6 + layer * 0.15})`;
+                                ctx.fill();
+                            }
+                        } else if (b.isSakuraTree) {
+                            // Sakura tree with pink blossoms
+                            ctx.fillStyle = '#3a2020';
+                            ctx.fillRect(bx + b.width * 0.4, by + b.height * 0.5, b.width * 0.2, b.height * 0.5);
+                            // Pink blossom top
+                            ctx.beginPath();
+                            ctx.arc(bx + b.width / 2, by + b.height * 0.3, b.width * 0.5, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(255, ${150 + layer * 30}, 200, ${0.5 + layer * 0.15})`;
+                            ctx.fill();
+                        } else if (b.isMaiTree) {
+                            // Mai/Dao tree with yellow/pink flowers
+                            ctx.fillStyle = '#4a3020';
+                            ctx.fillRect(bx + b.width * 0.35, by + b.height * 0.4, b.width * 0.3, b.height * 0.6);
+                            // Yellow/pink flower blooms
+                            const flowerColor = layer % 2 === 0 ? '#ffd700' : '#ff69b4';
+                            for (let f = 0; f < 5; f++) {
+                                const fx = bx + b.width * 0.2 + Math.random() * b.width * 0.6;
+                                const fy = by + Math.random() * b.height * 0.5;
+                                ctx.beginPath();
+                                ctx.arc(fx, fy, 5 + Math.random() * 8, 0, Math.PI * 2);
+                                ctx.fillStyle = flowerColor;
+                                ctx.globalAlpha = 0.6 + layer * 0.15;
+                                ctx.fill();
+                                ctx.globalAlpha = 1;
+                            }
+                        } else if (b.isCoral) {
+                            // Ocean coral
+                            ctx.beginPath();
+                            ctx.moveTo(bx, h);
+                            for (let i = 0; i < 5; i++) {
+                                ctx.lineTo(bx + b.width * (i / 5), by + Math.sin(i * 2 + time) * 10);
+                                ctx.lineTo(bx + b.width * ((i + 0.5) / 5), by - 20 + Math.sin(i * 3 + time * 2) * 15);
+                            }
+                            ctx.lineTo(bx + b.width, h);
+                            ctx.fillStyle = b.color;
+                            ctx.fill();
+                        } else {
+                            // City buildings
+                            ctx.fillStyle = b.color;
+                            ctx.fillRect(bx, by, b.width, b.height);
+                            ctx.strokeStyle = `rgba(255, 105, 180, ${0.1 + layer * 0.1})`;
+                            ctx.lineWidth = 1;
+                            ctx.strokeRect(bx, by, b.width, b.height);
+                            // Windows
+                            const winW = 6, winH = 10, winGap = 18;
+                            for (let row = 0; row < Math.min(b.windows || 0, Math.floor((b.height - 20) / winGap)); row++) {
+                                for (let col = 0; col < 3; col++) {
+                                    const wx = bx + 8 + col * (b.width - 20) / 3;
+                                    const wy = by + 12 + row * winGap;
+                                    const lit = Math.sin(b.x + row * 5 + col * 7 + time) > 0.3;
+                                    ctx.fillStyle = lit ? `rgba(255, 200, 100, ${0.4 + layer * 0.2})` : 'rgba(20, 10, 30, 0.8)';
+                                    ctx.fillRect(wx, wy, winW, winH);
+                                }
+                            }
+                            if (b.height > 180) {
+                                ctx.strokeStyle = 'rgba(255, 105, 180, 0.4)'; ctx.lineWidth = 2;
+                                ctx.beginPath(); ctx.moveTo(bx + b.width / 2, by); ctx.lineTo(bx + b.width / 2, by - 15); ctx.stroke();
+                                if (Math.sin(time * 4) > 0) { ctx.beginPath(); ctx.arc(bx + b.width / 2, by - 15, 3, 0, Math.PI * 2); ctx.fillStyle = '#ff1493'; ctx.fill(); }
+                            }
+                        }
+                    });
+                }
             }
 
             // Floating objects
@@ -1255,6 +2077,58 @@
                 ctx.fillStyle = '#9932cc';
                 ctx.fillRect(p.x - 5, p.topHeight - 15, PIPE_WIDTH + 10, 15);
                 ctx.fillRect(p.x - 5, p.bottomY, PIPE_WIDTH + 10, 15);
+            });
+
+            // Draw Items (power-ups & obstacles) with SOFT CUTE effect
+            gameItems.forEach(item => {
+                if (item.collected) return;
+                const bounce = Math.sin(time * 4 + item.x * 0.01) * 5;
+                const ix = item.x, iy = item.y + bounce;
+
+                // Soft pulsing effect
+                const pulse = 0.95 + Math.sin(time * 4) * 0.08;
+                const glowPulse = 0.6 + Math.sin(time * 3) * 0.4;
+
+                // Soft pastel glow
+                ctx.beginPath();
+                ctx.arc(ix, iy, 22 + glowPulse * 6, 0, Math.PI * 2);
+                const glowGrad = ctx.createRadialGradient(ix, iy, 0, ix, iy, 30);
+                glowGrad.addColorStop(0, item.color + '88');
+                glowGrad.addColorStop(0.6, item.color + '33');
+                glowGrad.addColorStop(1, item.color + '00');
+                ctx.fillStyle = glowGrad;
+                ctx.fill();
+
+                // Cute small star sparkles (3 only)
+                for (let i = 0; i < 3; i++) {
+                    const angle = (time * 1.5 + i * Math.PI * 2 / 3) % (Math.PI * 2);
+                    const dist = 18 + Math.sin(time * 2 + i) * 4;
+                    const sx = ix + Math.cos(angle) * dist;
+                    const sy = iy + Math.sin(angle) * dist;
+                    ctx.save();
+                    ctx.translate(sx, sy);
+                    ctx.rotate(time * 2 + i);
+                    ctx.beginPath();
+                    for (let j = 0; j < 4; j++) {
+                        const a = j * Math.PI / 2;
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(Math.cos(a) * 3, Math.sin(a) * 3);
+                    }
+                    ctx.strokeStyle = item.isGood ? '#fff5cc' : '#ffcccc';
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Icon with gentle scale
+                ctx.save();
+                ctx.translate(ix, iy);
+                ctx.scale(pulse, pulse);
+                ctx.font = '28px serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(item.icon, 0, 0);
+                ctx.restore();
             });
 
             // HEART WITH CUTE SMALL WINGS
@@ -1334,6 +2208,30 @@
             ctx.fill();
 
             ctx.restore();
+
+            // Draw floating popup texts
+            const now = Date.now();
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                const age = now - ft.birth;
+                ft.opacity = 1 - age / 1500;
+                ft.y -= 1.5;
+
+                if (ft.opacity <= 0 || age > 1500) {
+                    floatingTexts.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.font = 'bold 22px "Fira Code", monospace';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = ft.color;
+                ctx.globalAlpha = ft.opacity;
+                ctx.shadowColor = ft.color;
+                ctx.shadowBlur = 15;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            }
         }
 
         function flappyGameLoop() {
