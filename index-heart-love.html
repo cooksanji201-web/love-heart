@@ -6,6 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>💖 Magic Heart - Love Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js Post-processing -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -143,21 +152,50 @@
         button {
             pointer-events: auto;
             cursor: pointer;
-            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
-            color: #FFF;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 12px 28px;
-            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(255, 80, 180, 0.25), rgba(180, 40, 140, 0.35));
+            color: #fff;
+            border: 1px solid rgba(255, 150, 200, 0.3);
+            padding: 14px 32px;
+            border-radius: 16px;
             font-weight: 600;
             font-size: 15px;
             font-family: inherit;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            box-shadow:
+                0 4px 15px rgba(255, 20, 147, 0.3),
+                0 8px 30px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::before {
+            left: 100%;
         }
 
         button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow:
+                0 8px 25px rgba(255, 20, 147, 0.4),
+                0 15px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 200, 230, 0.5);
+        }
+
+        button:active {
+            transform: translateY(-1px) scale(0.98);
         }
 
         @keyframes pulse {
@@ -172,36 +210,77 @@
             }
         }
 
-        /* Controls */
+        /* Controls Panel - 3D Glass Card */
         #controls {
             position: absolute;
-            top: 15px;
-            left: 15px;
+            top: 20px;
+            left: 20px;
             z-index: 100;
             display: none;
+            background: linear-gradient(145deg, rgba(40, 20, 60, 0.9), rgba(25, 12, 40, 0.95));
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 100, 180, 0.25);
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(255, 20, 147, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
         }
 
         .control-btn {
-            display: block;
-            margin: 8px 0;
-            padding: 10px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0;
+            padding: 12px 18px;
+            border: 1px solid rgba(255, 150, 200, 0.15);
+            border-radius: 12px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-            width: 180px;
+            width: 175px;
             text-align: left;
             font-family: inherit;
-            backdrop-filter: blur(6px);
-            background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-            color: #ffb6d9;
+            backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(255, 80, 180, 0.12), rgba(180, 40, 140, 0.08));
+            color: #ffd0e8;
+            box-shadow:
+                0 3px 10px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-btn::after {
+            content: '→';
+            position: absolute;
+            right: 15px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.2s ease;
+            color: #ff69b4;
         }
 
         .control-btn:hover {
-            transform: translateX(6px);
-            box-shadow: 0 12px 26px rgba(0,0,0,0.6);
+            transform: translateX(5px);
+            background: linear-gradient(135deg, rgba(255, 100, 200, 0.25), rgba(200, 60, 160, 0.2));
+            border-color: rgba(255, 180, 220, 0.3);
+            box-shadow:
+                0 6px 20px rgba(255, 20, 147, 0.2),
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .control-btn:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .control-btn:active {
+            transform: translateX(3px) scale(0.98);
         }
 
         /* State indicator */
@@ -843,52 +922,29 @@
             }
         }
 
-        /* Level up notification */
+        /* Level up notification - top bar style */
         #level-up-toast {
             position: fixed;
-            top: 50%;
+            top: -60px;
             left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 140, 0, 0.9));
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff1493, #ff69b4);
             color: white;
-            padding: 30px 60px;
-            border-radius: 20px;
-            font-size: 32px;
+            padding: 12px 40px;
+            border-radius: 30px;
+            font-size: 18px;
             font-weight: bold;
             z-index: 500;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
             pointer-events: none;
+            box-shadow: 0 4px 20px rgba(255, 20, 147, 0.5);
+            transition: top 0.3s ease;
         }
 
         #level-up-toast.show {
-            animation: levelUpAnim 1.5s ease forwards;
+            top: 80px;
         }
 
-        @keyframes levelUpAnim {
-            0% {
-                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
-                opacity: 0;
-            }
-
-            20% {
-                transform: translate(-50%, -50%) scale(1.2) rotate(5deg);
-                opacity: 1;
-            }
-
-            40% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-            }
-
-            80% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-
-            100% {
-                transform: translate(-50%, -50%) scale(0.5) rotate(10deg);
-                opacity: 0;
-            }
-        }
         /* Level transition overlay */
         #level-transition {
             position: fixed;
@@ -906,24 +962,313 @@
             backdrop-filter: blur(6px);
         }
 
-        #level-transition.show { opacity: 1; pointer-events: auto; }
+        #level-transition.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         .lt-box {
-            background: linear-gradient(135deg, rgba(20,10,30,0.95), rgba(40,0,60,0.95));
+            background: linear-gradient(135deg, rgba(20, 10, 30, 0.95), rgba(40, 0, 60, 0.95));
             padding: 28px 36px;
             border-radius: 16px;
             display: flex;
             gap: 18px;
             align-items: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 0 24px rgba(255,20,147,0.03);
-            border: 1px solid rgba(255,255,255,0.04);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 24px rgba(255, 20, 147, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        .lt-icon { font-size: 44px; }
-        .lt-text { color: #ffd7f0; font-size: 20px; font-weight: 700; }
+        .lt-icon {
+            font-size: 44px;
+        }
+
+        .lt-text {
+            color: #ffd7f0;
+            font-size: 20px;
+            font-weight: 700;
+        }
 
         /* Blur state applied during level transition */
-        #flappy-game.blurred, #canvas-container.blurred { filter: blur(6px) brightness(0.7); transition: filter 0.28s ease; }
+        #flappy-game.blurred,
+        #canvas-container.blurred {
+            filter: blur(6px) brightness(0.7);
+            transition: filter 0.28s ease;
+        }
+
+        /* Spotify Music Player */
+        #spotify-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 300;
+        }
+
+        #spotify-mini-player {
+            background: linear-gradient(145deg, rgba(40, 20, 50, 0.95), rgba(25, 12, 35, 0.98));
+            padding: 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 100, 180, 0.3);
+            box-shadow:
+                0 15px 50px rgba(0, 0, 0, 0.7),
+                0 0 40px rgba(255, 20, 147, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 320px;
+            transform: perspective(1000px) rotateX(2deg);
+            transition: all 0.3s ease;
+        }
+
+        #spotify-mini-player:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.8),
+                0 0 60px rgba(255, 20, 147, 0.25);
+        }
+
+        #spotify-header {
+            color: #ff69b4;
+            font-size: 16px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+        }
+
+        #spotify-url-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 150, 200, 0.25);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: #ffd0e8;
+            font-size: 12px;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        #spotify-url-input:focus {
+            border-color: rgba(255, 105, 180, 0.5);
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.2);
+            outline: none;
+        }
+
+        #spotify-url-input::placeholder {
+            color: rgba(255, 200, 220, 0.4);
+        }
+
+        #spotify-load-btn {
+            background: linear-gradient(135deg, #ff1493, #c71585);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+        }
+
+        #spotify-load-btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 20, 147, 0.5);
+        }
+
+        #spotify-embed-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #spotify-embed-container iframe {
+            border-radius: 15px;
+        }
+
+        #spotify-toggle {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff1493, #c71585);
+            border: 2px solid rgba(255, 200, 230, 0.3);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow:
+                0 5px 20px rgba(255, 20, 147, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        #spotify-toggle:hover {
+            transform: scale(1.15) rotate(10deg);
+            box-shadow: 0 8px 30px rgba(255, 20, 147, 0.6);
+        }
+
+        #spotify-player.collapsed #spotify-mini-player {
+            display: none;
+        }
+
+        #spotify-player.collapsed #spotify-toggle {
+            top: 0;
+        }
+
+        #spotify-note {
+            font-size: 11px;
+            color: rgba(255, 180, 210, 0.6);
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        #spotify-login-btn {
+            background: linear-gradient(135deg, #ff1493, #c71585);
+            border: none;
+            border-radius: 25px;
+            padding: 14px 30px;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            box-shadow: 0 5px 25px rgba(255, 20, 147, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        #spotify-login-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 35px rgba(255, 20, 147, 0.5);
+        }
+
+        #spotify-album-art-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        #spotify-album-art {
+            width: 180px;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(255, 20, 147, 0.3);
+        }
+
+        #spotify-track-info {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        #spotify-track-name {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #spotify-artist-name {
+            color: rgba(255, 180, 210, 0.8);
+            font-size: 12px;
+        }
+
+        #spotify-progress-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        #spotify-progress-container span {
+            font-size: 10px;
+            color: rgba(255, 200, 220, 0.7);
+            min-width: 35px;
+        }
+
+        #spotify-progress {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        #spotify-progress::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #ff1493;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+        }
+
+        #spotify-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        #spotify-controls button {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(145deg, rgba(255, 80, 180, 0.3), rgba(180, 40, 140, 0.4));
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #spotify-controls button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 20, 147, 0.5);
+        }
+
+        #spotify-play {
+            width: 55px !important;
+            height: 55px !important;
+            font-size: 22px !important;
+            background: linear-gradient(135deg, #ff1493, #c71585) !important;
+        }
+
+        #spotify-volume-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #spotify-volume-container span {
+            font-size: 14px;
+        }
+
+        #spotify-volume {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        #spotify-volume::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 10px;
+            height: 10px;
+            background: #ff69b4;
+            border-radius: 50%;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -939,11 +1284,10 @@
     </div>
 
     <div id="controls">
-        <button class="control-btn" onclick="setState('HEART')">💖 1. Heart</button>
-        <button class="control-btn" onclick="setState('EXPLODE')">✨ 2. Explode</button>
-        <button class="control-btn" onclick="setState('SPIRAL')">🌀 3. Spiral</button>
-        <button class="control-btn" onclick="setState('CODE_HEART')">💻 4. Code Heart</button>
-        <button class="control-btn" onclick="setState('FLAPPY')">🎮 5. Flappy Heart</button>
+        <button class="control-btn" onclick="setState('EXPLODE')">✨ 1. Explode</button>
+        <button class="control-btn" onclick="setState('SPIRAL')">🌀 2. Spiral</button>
+        <button class="control-btn" onclick="setState('CODE_HEART')">💻 3. Code Heart</button>
+        <button class="control-btn" onclick="setState('FLAPPY')">🎮 4. Flappy Heart</button>
     </div>
 
     <div id="state-indicator">Mode: <span id="current-state">HEART</span></div>
@@ -954,6 +1298,44 @@
 
     <div id="copyright">💖 Love Edition</div>
     <div id="canvas-container"></div>
+
+    <!-- Spotify Web Playback SDK Player -->
+    <div id="spotify-player">
+        <button id="spotify-toggle" onclick="toggleSpotifyPlayer()">🎵</button>
+        <div id="spotify-mini-player">
+            <!-- Not logged in state -->
+            <div id="spotify-login-section">
+                <div id="spotify-header">🎵 Spotify Premium</div>
+                <button id="spotify-login-btn" onclick="spotifyLogin()">🔐 Đăng nhập Spotify</button>
+                <div id="spotify-note">Cần tài khoản Premium để phát nhạc</div>
+            </div>
+            <!-- Playing state (hidden by default) -->
+            <div id="spotify-playing-section" style="display:none;">
+                <div id="spotify-album-art-container">
+                    <img id="spotify-album-art" src="" alt="Album Art" />
+                </div>
+                <div id="spotify-track-info">
+                    <div id="spotify-track-name">Chưa phát nhạc</div>
+                    <div id="spotify-artist-name">---</div>
+                </div>
+                <div id="spotify-progress-container">
+                    <span id="spotify-current-time">0:00</span>
+                    <input type="range" id="spotify-progress" min="0" max="100" value="0" />
+                    <span id="spotify-duration">0:00</span>
+                </div>
+                <div id="spotify-controls">
+                    <button id="spotify-prev" onclick="spotifyPrev()">⏮</button>
+                    <button id="spotify-play" onclick="spotifyTogglePlay()">▶</button>
+                    <button id="spotify-next" onclick="spotifyNext()">⏭</button>
+                </div>
+                <div id="spotify-volume-container">
+                    <span>🔊</span>
+                    <input type="range" id="spotify-volume" min="0" max="100" value="50"
+                        onchange="spotifySetVolume(this.value)" />
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Flappy Game -->
     <div id="flappy-game">
@@ -1074,6 +1456,117 @@
             const bestEl = document.getElementById('player-best');
             if (bestEl) bestEl.textContent = localStorage.getItem('flappyHS') || 0;
         }
+
+        // Spotify Web Playback SDK
+        const SPOTIFY_CLIENT_ID = '799ab64811454ec78d5f47e21729cc7a';
+        const SPOTIFY_REDIRECT_URI = 'https://cooksanji201-web.github.io/love-heart/';
+        const SPOTIFY_SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state';
+
+        let spotifyPlayer = null;
+        let spotifyDeviceId = null;
+        let spotifyToken = null;
+        let spotifyIsPlaying = false;
+
+        // Check for token in URL after OAuth redirect
+        function checkSpotifyAuth() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const accessToken = params.get('access_token');
+
+            if (accessToken) {
+                spotifyToken = accessToken;
+                localStorage.setItem('spotify_token', accessToken);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                initSpotifyPlayer();
+            } else {
+                const savedToken = localStorage.getItem('spotify_token');
+                if (savedToken) {
+                    spotifyToken = savedToken;
+                    initSpotifyPlayer();
+                }
+            }
+        }
+
+        function spotifyLogin() {
+            const authUrl = `https://accounts.spotify.com/authorize?client_id=${SPOTIFY_CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(SPOTIFY_REDIRECT_URI)}&scope=${encodeURIComponent(SPOTIFY_SCOPES)}&show_dialog=true`;
+            window.location.href = authUrl;
+        }
+
+        function initSpotifyPlayer() {
+            const script = document.createElement('script');
+            script.src = 'https://sdk.scdn.co/spotify-player.js';
+            document.body.appendChild(script);
+
+            window.onSpotifyWebPlaybackSDKReady = () => {
+                spotifyPlayer = new Spotify.Player({
+                    name: 'Magic Heart Player 💖',
+                    getOAuthToken: cb => { cb(spotifyToken); },
+                    volume: 0.5
+                });
+
+                spotifyPlayer.addListener('ready', ({ device_id }) => {
+                    spotifyDeviceId = device_id;
+                    document.getElementById('spotify-login-section').style.display = 'none';
+                    document.getElementById('spotify-playing-section').style.display = 'block';
+                    transferPlayback(device_id);
+                });
+
+                spotifyPlayer.addListener('player_state_changed', state => {
+                    if (!state) return;
+                    updateSpotifyUI(state);
+                });
+
+                spotifyPlayer.addListener('authentication_error', ({ message }) => {
+                    localStorage.removeItem('spotify_token');
+                    document.getElementById('spotify-login-section').style.display = 'block';
+                    document.getElementById('spotify-playing-section').style.display = 'none';
+                });
+
+                spotifyPlayer.addListener('account_error', ({ message }) => {
+                    alert('Cần tài khoản Spotify Premium!');
+                });
+
+                spotifyPlayer.connect();
+            };
+        }
+
+        function transferPlayback(deviceId) {
+            fetch('https://api.spotify.com/v1/me/player', {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${spotifyToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ device_ids: [deviceId], play: false })
+            });
+        }
+
+        function updateSpotifyUI(state) {
+            const track = state.track_window.current_track;
+            spotifyIsPlaying = !state.paused;
+            document.getElementById('spotify-track-name').textContent = track.name;
+            document.getElementById('spotify-artist-name').textContent = track.artists.map(a => a.name).join(', ');
+            document.getElementById('spotify-album-art').src = track.album.images[0]?.url || '';
+            document.getElementById('spotify-play').textContent = spotifyIsPlaying ? '⏸' : '▶';
+            document.getElementById('spotify-current-time').textContent = formatTime(state.position);
+            document.getElementById('spotify-duration').textContent = formatTime(state.duration);
+            document.getElementById('spotify-progress').value = (state.position / state.duration) * 100;
+        }
+
+        function formatTime(ms) {
+            const sec = Math.floor(ms / 1000);
+            return `${Math.floor(sec / 60)}:${(sec % 60).toString().padStart(2, '0')}`;
+        }
+
+        function spotifyTogglePlay() { if (spotifyPlayer) spotifyPlayer.togglePlay(); }
+        function spotifyPrev() { if (spotifyPlayer) spotifyPlayer.previousTrack(); }
+        function spotifyNext() { if (spotifyPlayer) spotifyPlayer.nextTrack(); }
+        function spotifySetVolume(val) { if (spotifyPlayer) spotifyPlayer.setVolume(val / 100); }
+
+        function toggleSpotifyPlayer() {
+            const player = document.getElementById('spotify-player');
+            player.classList.toggle('collapsed');
+            document.getElementById('spotify-toggle').textContent = player.classList.contains('collapsed') ? '🎵' : '✕';
+        }
+
+        checkSpotifyAuth();
 
         // Leaderboard functions
         function saveScore(score, level) {
@@ -1203,6 +1696,8 @@
             }, 1200);
         }
 
+        let composer; // Post-processing composer
+
         function init3D() {
             scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2(0x0a0a0f, 0.003);
@@ -1211,7 +1706,20 @@
             renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
             renderer.setSize(innerWidth, innerHeight);
             renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+            renderer.toneMapping = THREE.ReinhardToneMapping;
             document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Setup Post-processing with Bloom
+            const renderScene = new THREE.RenderPass(scene, camera);
+            const bloomPass = new THREE.UnrealBloomPass(
+                new THREE.Vector2(innerWidth, innerHeight),
+                1.2,   // strength - glow intensity
+                0.4,   // radius - spread
+                0.85   // threshold - only bright pixels glow
+            );
+            composer = new THREE.EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
 
             groupMain = createParticleSystem('glow1', CONFIG.particleCount1, 2.5);
             groupSecondary = createParticleSystem('glow2', CONFIG.particleCount2, 3.5);
@@ -1345,7 +1853,12 @@
                     mesh.lookAt(camera.position);
                 });
             }
-            renderer.render(scene, camera);
+            // Use composer for bloom effect, fallback to renderer
+            if (composer) {
+                composer.render();
+            } else {
+                renderer.render(scene, camera);
+            }
         }
 
         function setState(newState) {
@@ -1415,6 +1928,7 @@
 
         // Power-ups & Items with RARITY (lower = rarer)
         let gameItems = [], activeEffects = {};
+        let shurikens = []; // Flying shurikens from right to left
         let playerLives = 1; // Start with 1 life
 
         // Items - EQUAL RARITY for variety
@@ -1514,23 +2028,13 @@
         }
 
         function showLevelTransition() {
-            const el = document.getElementById('level-transition');
-            const icon = document.getElementById('lt-icon');
-            const text = document.getElementById('lt-text');
+            // Simple toast without blur - less intrusive
+            const toast = document.getElementById('level-up-toast');
             const themes = { city: '🌃', forest: '🌲', sakura: '🌸', ocean: '🌊', space: '🚀', tet: '🧧' };
-            icon.textContent = themes[currentTheme] || '🌃';
-            text.textContent = `Level ${currentLevel} — ${currentTheme.toUpperCase()}`;
-            // Blur the game briefly and show compact overlay
-            const gameEl = document.getElementById('flappy-game');
-            const canvasEl = document.getElementById('canvas-container');
-            if (gameEl) gameEl.classList.add('blurred');
-            if (canvasEl) canvasEl.classList.add('blurred');
-            el.classList.add('show');
-            setTimeout(() => {
-                el.classList.remove('show');
-                if (gameEl) gameEl.classList.remove('blurred');
-                if (canvasEl) canvasEl.classList.remove('blurred');
-            }, 1200);
+            const emoji = themes[currentTheme] || '🌃';
+            toast.textContent = `${emoji} Level ${currentLevel}!`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 800);
         }
 
         function updateLevel() {
@@ -1668,10 +2172,34 @@
             lastGapY = gapCenterY;
 
             const topH = gapCenterY - gap / 2;
-            const pipe = { x: innerWidth, topHeight: topH, bottomY: gapCenterY + gap / 2, gapCenterY, passed: false };
+
+            // Moving pipes (level 5+): some pipes oscillate up/down
+            const isMoving = currentLevel >= 5 && Math.random() < 0.3;
+            const moveSpeed = 0.5 + Math.random() * 0.5;
+            const moveRange = 30 + Math.random() * 30;
+
+            // Spike obstacle in gap (level 7+): slows player on touch
+            const hasSpike = currentLevel >= 7 && Math.random() < 0.25;
+            const spikeY = hasSpike ? gapCenterY : 0;
+
+            const pipe = {
+                x: innerWidth,
+                topHeight: topH,
+                bottomY: gapCenterY + gap / 2,
+                gapCenterY,
+                passed: false,
+                isMoving,
+                moveSpeed,
+                moveRange,
+                moveOffset: 0,
+                moveDir: 1,
+                hasSpike,
+                spikeY,
+                spikeHit: false
+            };
             flappyPipes.push(pipe);
 
-                // Item spawn: reduced frequency — spawn roughly every 6+ pipes
+            // Item spawn: reduced frequency — spawn roughly every 6+ pipes
             pipeCounter++;
             const spawnThreshold = 6 + Math.floor(currentLevel / 6); // rarer items; slowly changes with level
             if (pipeCounter >= spawnThreshold) {
@@ -1748,14 +2276,45 @@
             if (flappyPipes.length === 0 || flappyPipes[flappyPipes.length - 1].x < innerWidth - spawnDist) createPipe();
 
             for (let i = flappyPipes.length - 1; i >= 0; i--) {
-                flappyPipes[i].x -= settings.pipeSpeed * speedMult;
-                if (!flappyPipes[i].passed && flappyPipes[i].x + PIPE_WIDTH < flappyBird.x) {
-                    flappyPipes[i].passed = true;
+                const p = flappyPipes[i];
+                p.x -= settings.pipeSpeed * speedMult;
+
+                // Moving pipes oscillate up/down
+                if (p.isMoving) {
+                    p.moveOffset += p.moveSpeed * p.moveDir;
+                    if (Math.abs(p.moveOffset) > p.moveRange) {
+                        p.moveDir *= -1;
+                    }
+                }
+
+                // Check spike collision
+                if (p.hasSpike && !p.spikeHit) {
+                    const spikeX = p.x + PIPE_WIDTH / 2;
+                    const spikeY = p.gapCenterY + (p.moveOffset || 0);
+                    const dx = flappyBird.x - spikeX;
+                    const dy = flappyBird.y - spikeY;
+                    if (Math.sqrt(dx * dx + dy * dy) < flappyBird.radius + 25) {
+                        p.spikeHit = true;
+                        if (activeEffects.shield) {
+                            activeEffects.shield = false;
+                            showItemPopup('🛡️ Chặn!', '#00ff7f', spikeX, spikeY);
+                            updateEffectsUI();
+                        } else {
+                            // Slow effect - reduce velocity
+                            activeEffects.slow = Date.now() + 2000;
+                            flappyBird.velocity *= 0.5;
+                            showItemPopup('🔻 Chậm!', '#ff6600', spikeX, spikeY);
+                        }
+                    }
+                }
+
+                if (!p.passed && p.x + PIPE_WIDTH < flappyBird.x) {
+                    p.passed = true;
                     flappyScore += 1;
                     document.getElementById('flappy-score').textContent = flappyScore;
                     updateLevel();
                 }
-                if (flappyPipes[i].x < -PIPE_WIDTH) flappyPipes.splice(i, 1);
+                if (p.x < -PIPE_WIDTH) flappyPipes.splice(i, 1);
             }
 
             // Update items
@@ -1770,6 +2329,40 @@
                 if (Math.sqrt(dx * dx + dy * dy) < flappyBird.radius + 20) {
                     collectItem(gameItems[i]);
                     gameItems[i].collected = true;
+                }
+            }
+
+            // Spawn shurikens (level 7+) - flying projectiles
+            if (currentLevel >= 7 && Math.random() < 0.008) { // Low spawn rate
+                shurikens.push({
+                    x: innerWidth + 50,
+                    y: 80 + Math.random() * (innerHeight - 160),
+                    speed: 4 + Math.random() * 3,
+                    hit: false
+                });
+            }
+
+            // Update shurikens
+            for (let i = shurikens.length - 1; i >= 0; i--) {
+                const s = shurikens[i];
+                s.x -= s.speed;
+                if (s.x < -50) { shurikens.splice(i, 1); continue; }
+                if (s.hit) continue;
+
+                // Check collision with player
+                const dx = flappyBird.x - s.x;
+                const dy = flappyBird.y - s.y;
+                if (Math.sqrt(dx * dx + dy * dy) < flappyBird.radius + 18) {
+                    s.hit = true;
+                    if (activeEffects.shield) {
+                        activeEffects.shield = false;
+                        showItemPopup('🛡️ Chặn!', '#00ff7f', s.x, s.y);
+                        updateEffectsUI();
+                    } else {
+                        // Slow effect - apply immediately
+                        flappyBird.velocity = Math.min(flappyBird.velocity, 1);
+                        showItemPopup('🔻 Chậm!', '#ff6600', s.x, s.y);
+                    }
                 }
             }
 
@@ -2092,18 +2685,56 @@
 
             // Pipes
             flappyPipes.forEach(p => {
+                // Apply move offset for moving pipes
+                const offset = p.moveOffset || 0;
+                const topH = p.topHeight + offset;
+                const bottomY = p.bottomY + offset;
+
                 const pGrad = ctx.createLinearGradient(p.x, 0, p.x + PIPE_WIDTH, 0);
                 pGrad.addColorStop(0, '#8b008b'); pGrad.addColorStop(0.5, '#4b0082'); pGrad.addColorStop(1, '#8b008b');
                 ctx.fillStyle = pGrad;
-                ctx.fillRect(p.x, 0, PIPE_WIDTH, p.topHeight);
-                ctx.fillRect(p.x, p.bottomY, PIPE_WIDTH, h - p.bottomY);
-                ctx.strokeStyle = '#ff69b4'; ctx.lineWidth = 3;
-                ctx.strokeRect(p.x, 0, PIPE_WIDTH, p.topHeight);
-                ctx.strokeRect(p.x, p.bottomY, PIPE_WIDTH, h - p.bottomY);
+                ctx.fillRect(p.x, 0, PIPE_WIDTH, topH);
+                ctx.fillRect(p.x, bottomY, PIPE_WIDTH, h - bottomY);
+
+                // Moving pipe glow indicator
+                if (p.isMoving) {
+                    ctx.strokeStyle = '#ff00ff'; ctx.lineWidth = 4;
+                } else {
+                    ctx.strokeStyle = '#ff69b4'; ctx.lineWidth = 3;
+                }
+                ctx.strokeRect(p.x, 0, PIPE_WIDTH, topH);
+                ctx.strokeRect(p.x, bottomY, PIPE_WIDTH, h - bottomY);
+
                 // Pipe caps
-                ctx.fillStyle = '#9932cc';
-                ctx.fillRect(p.x - 5, p.topHeight - 15, PIPE_WIDTH + 10, 15);
-                ctx.fillRect(p.x - 5, p.bottomY, PIPE_WIDTH + 10, 15);
+                ctx.fillStyle = p.isMoving ? '#cc00cc' : '#9932cc';
+                ctx.fillRect(p.x - 5, topH - 15, PIPE_WIDTH + 10, 15);
+                ctx.fillRect(p.x - 5, bottomY, PIPE_WIDTH + 10, 15);
+
+                // Draw spike in gap
+                if (p.hasSpike) {
+                    const spikeX = p.x + PIPE_WIDTH / 2;
+                    const spikeY = p.gapCenterY + offset;
+                    ctx.save();
+                    ctx.translate(spikeX, spikeY);
+                    ctx.rotate(time * 2);
+                    // Draw spiky star
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const r = i % 2 === 0 ? 20 : 10;
+                        const x = Math.cos(angle) * r;
+                        const y = Math.sin(angle) * r;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fillStyle = p.spikeHit ? '#666' : '#ff4444';
+                    ctx.fill();
+                    ctx.strokeStyle = '#ff0000';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
             });
 
             // Draw Items (power-ups & obstacles) with SOFT CUTE effect
@@ -2155,6 +2786,35 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(item.icon, 0, 0);
+                ctx.restore();
+            });
+
+            // Draw flying shurikens
+            shurikens.forEach(s => {
+                ctx.save();
+                ctx.translate(s.x, s.y);
+                ctx.rotate(time * 8); // Fast rotation
+                // Draw 4-pointed star shuriken
+                ctx.beginPath();
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const r = i % 2 === 0 ? 18 : 8;
+                    const px = Math.cos(angle) * r;
+                    const py = Math.sin(angle) * r;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fillStyle = s.hit ? '#555' : '#ff3333';
+                ctx.fill();
+                ctx.strokeStyle = s.hit ? '#333' : '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                // Center circle
+                ctx.beginPath();
+                ctx.arc(0, 0, 4, 0, Math.PI * 2);
+                ctx.fillStyle = s.hit ? '#444' : '#660000';
+                ctx.fill();
                 ctx.restore();
             });
 
