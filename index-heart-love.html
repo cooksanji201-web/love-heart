@@ -11,6 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
         * {
             margin: 0;
@@ -21,8 +22,11 @@
         body {
             overflow: hidden;
             background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1a 50%, #0a0a0f 100%);
-            font-family: 'Fira Code', monospace;
+            font-family: 'Poppins', 'Fira Code', monospace;
             cursor: none;
+            color: #fff;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         #canvas-container {
@@ -139,23 +143,21 @@
         button {
             pointer-events: auto;
             cursor: pointer;
-            background: linear-gradient(135deg, #ff1493, #c71585, #ff69b4);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
             color: #FFF;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 15px 50px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
             font-family: inherit;
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.6);
-            animation: pulse 1.5s infinite;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
         }
 
         button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(255, 20, 147, 0.8);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
         }
 
         @keyframes pulse {
@@ -182,24 +184,24 @@
         .control-btn {
             display: block;
             margin: 8px 0;
-            padding: 12px 20px;
-            border: 1px solid rgba(255, 105, 180, 0.4);
-            border-radius: 10px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            transition: all 0.3s;
-            width: 160px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            width: 180px;
             text-align: left;
             font-family: inherit;
-            backdrop-filter: blur(10px);
-            background: linear-gradient(135deg, rgba(255, 20, 147, 0.6), rgba(199, 21, 133, 0.6));
-            color: white;
+            backdrop-filter: blur(6px);
+            background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+            color: #ffb6d9;
         }
 
         .control-btn:hover {
-            transform: translateX(5px);
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+            transform: translateX(6px);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.6);
         }
 
         /* State indicator */
@@ -478,9 +480,9 @@
             background-clip: text;
             -webkit-background-clip: text;
             text-align: center;
-            margin-bottom: 25px;
-            font-size: 28px;
-            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            margin-bottom: 20px;
+            font-size: 30px;
+            text-shadow: 0 0 28px rgba(255, 215, 0, 0.45);
             animation: shimmer 2s infinite;
         }
 
@@ -520,13 +522,14 @@
         #leaderboard-list li {
             display: flex;
             align-items: center;
-            padding: 12px 15px;
-            margin: 8px 0;
-            background: rgba(255, 20, 147, 0.1);
-            border-radius: 12px;
+            padding: 14px 18px;
+            margin: 10px 0;
+            background: rgba(255, 20, 147, 0.06);
+            border-radius: 14px;
             color: #fff;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 105, 180, 0.2);
+            transition: all 0.24s ease;
+            border: 1px solid rgba(255, 105, 180, 0.12);
+            font-size: 15px;
         }
 
         #leaderboard-list li:hover {
@@ -886,6 +889,41 @@
                 opacity: 0;
             }
         }
+        /* Level transition overlay */
+        #level-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 600;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.28s ease;
+            backdrop-filter: blur(6px);
+        }
+
+        #level-transition.show { opacity: 1; pointer-events: auto; }
+
+        .lt-box {
+            background: linear-gradient(135deg, rgba(20,10,30,0.95), rgba(40,0,60,0.95));
+            padding: 28px 36px;
+            border-radius: 16px;
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), inset 0 0 24px rgba(255,20,147,0.03);
+            border: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .lt-icon { font-size: 44px; }
+        .lt-text { color: #ffd7f0; font-size: 20px; font-weight: 700; }
+
+        /* Blur state applied during level transition */
+        #flappy-game.blurred, #canvas-container.blurred { filter: blur(6px) brightness(0.7); transition: filter 0.28s ease; }
     </style>
 </head>
 
@@ -950,6 +988,12 @@
         </div>
     </div>
     <div id="level-up-toast">🎉 LEVEL UP! 🎉</div>
+    <div id="level-transition" class="hidden">
+        <div class="lt-box">
+            <div class="lt-icon" id="lt-icon">🌃</div>
+            <div class="lt-text" id="lt-text">Level 1 — 🌃</div>
+        </div>
+    </div>
 
     <!-- Name Input Modal -->
     <div id="name-modal">
@@ -1104,7 +1148,7 @@
 
         let scene, camera, renderer, groupMain, groupSecondary, groupHearts, photoMeshes = [], loveMesh, titleMesh;
         let state = 'HEART', mouseX = 0.5, mouseY = 0.5, tiltAngle = 0, targetTilt = 0, isDragging = false;
-        const CONFIG = { particleCount1: 2500, particleCount2: 500, heartCount: 200, explodeRadius: 70, photoOrbitRadius: 25, spiralHeight: 80 };
+        const CONFIG = { particleCount1: 1200, particleCount2: 300, heartCount: 120, explodeRadius: 70, photoOrbitRadius: 25, spiralHeight: 80 };
 
         function createGlowTexture(c1, c2) {
             const canvas = document.createElement('canvas'); canvas.width = 128; canvas.height = 128;
@@ -1131,17 +1175,18 @@
         function createCodeRain() {
             const container = document.getElementById('code-rain');
             const snippets = ['love++', '❤️', 'if(love)', 'return you', 'while(true)', 'heart = full', 'you && me', 'forever()', '💕', '💖'];
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 12; i++) {
                 const col = document.createElement('div');
                 col.className = 'code-column';
-                col.style.left = (i * 5) + '%';
-                col.style.animationDuration = (8 + Math.random() * 10) + 's';
+                col.style.left = (i * 7.5) + '%';
+                col.style.animationDuration = (9 + Math.random() * 10) + 's';
                 col.style.animationDelay = (Math.random() * 5) + 's';
                 let text = '';
-                for (let j = 0; j < 30; j++) text += snippets[Math.floor(Math.random() * snippets.length)] + '<br>';
+                for (let j = 0; j < 20; j++) text += snippets[Math.floor(Math.random() * snippets.length)] + '<br>';
                 col.innerHTML = text;
                 container.appendChild(col);
             }
+            container.style.opacity = '0.12';
         }
 
         function createFloatingHearts() {
@@ -1154,8 +1199,8 @@
                 h.style.fontSize = (15 + Math.random() * 20) + 'px';
                 h.style.animationDuration = (5 + Math.random() * 5) + 's';
                 container.appendChild(h);
-                setTimeout(() => h.remove(), 10000);
-            }, 500);
+                setTimeout(() => h.remove(), 9000);
+            }, 1200);
         }
 
         function init3D() {
@@ -1373,18 +1418,14 @@
         let playerLives = 1; // Start with 1 life
 
         // Items - EQUAL RARITY for variety
+        // Final item set: only shield and heart (good), bomb (bad)
         const POWERUPS = [
-            { type: 'double', icon: '⭐', color: '#ffd700', duration: 5000, rarity: 20 },
-            { type: 'slowmo', icon: '⏳', color: '#87ceeb', duration: 5000, rarity: 20 },
-            { type: 'shrink', icon: '💎', color: '#ff69b4', duration: 5000, rarity: 20 },
-            { type: 'shield', icon: '🛡️', color: '#00ff7f', duration: 0, rarity: 20 },
-            { type: 'heart', icon: '💖', color: '#ff1493', duration: 0, rarity: 15 }
+            { type: 'shield', icon: '🛡️', color: '#00ff7f', duration: 0, rarity: 18 },
+            { type: 'heart', icon: '💖', color: '#ff1493', duration: 0, rarity: 14 }
         ];
+
         const OBSTACLES = [
-            { type: 'lightning', icon: '⚡', color: '#ffff00', rarity: 25 },  // Speed up
-            { type: 'bomb', icon: '💣', color: '#ff4444', rarity: 20 },       // Damage
-            { type: 'freeze', icon: '🥶', color: '#00ffff', rarity: 30 },     // Slow down heavily
-            { type: 'dizzy', icon: '😵', color: '#ff00ff', rarity: 25 }       // Invert controls
+            { type: 'bomb', icon: '💣', color: '#ff4444', rarity: 20 }
         ];
 
         // Dynamic game settings based on level
@@ -1396,7 +1437,7 @@
                 pipeSpeed: 2.5 + Math.min(l * 0.15, 2.5),
                 pipeGap: Math.max(240 - l * 4, 150),
                 spawnRate: Math.max(350 - l * 6, 250),
-                itemChance: Math.min(0.4 + l * 0.03, 0.7)  // Much higher item spawn rate
+                itemChance: Math.min(0.22 + l * 0.02, 0.45)  // Reduced item spawn rate for clarity
             };
         }
         const PIPE_WIDTH = 70;
@@ -1472,6 +1513,26 @@
             setTimeout(() => toast.classList.remove('show'), 1500);
         }
 
+        function showLevelTransition() {
+            const el = document.getElementById('level-transition');
+            const icon = document.getElementById('lt-icon');
+            const text = document.getElementById('lt-text');
+            const themes = { city: '🌃', forest: '🌲', sakura: '🌸', ocean: '🌊', space: '🚀', tet: '🧧' };
+            icon.textContent = themes[currentTheme] || '🌃';
+            text.textContent = `Level ${currentLevel} — ${currentTheme.toUpperCase()}`;
+            // Blur the game briefly and show compact overlay
+            const gameEl = document.getElementById('flappy-game');
+            const canvasEl = document.getElementById('canvas-container');
+            if (gameEl) gameEl.classList.add('blurred');
+            if (canvasEl) canvasEl.classList.add('blurred');
+            el.classList.add('show');
+            setTimeout(() => {
+                el.classList.remove('show');
+                if (gameEl) gameEl.classList.remove('blurred');
+                if (canvasEl) canvasEl.classList.remove('blurred');
+            }, 1200);
+        }
+
         function updateLevel() {
             const newLevel = Math.floor(flappyScore / 5) + 1;
             if (newLevel > currentLevel) {
@@ -1484,7 +1545,8 @@
                     initFlappyBackground();
                 }
                 updateLevelUI();
-                showLevelUp();
+                // Show a compact transition overlay and blur the game (no big toast text)
+                showLevelTransition();
             }
         }
 
@@ -1609,9 +1671,9 @@
             const pipe = { x: innerWidth, topHeight: topH, bottomY: gapCenterY + gap / 2, gapCenterY, passed: false };
             flappyPipes.push(pipe);
 
-            // Item spawn: every 2-3 pipes, difficulty progressive
+                // Item spawn: reduced frequency — spawn roughly every 6+ pipes
             pipeCounter++;
-            const spawnThreshold = pipeCounter % 2 === 0 ? 2 : 3;
+            const spawnThreshold = 6 + Math.floor(currentLevel / 6); // rarer items; slowly changes with level
             if (pipeCounter >= spawnThreshold) {
                 pipeCounter = 0;
 
@@ -1675,12 +1737,11 @@
         function updateFlappy() {
             if (!flappyRunning) return;
             const settings = getGameSettings();
-            const speedMult = activeEffects.slowmo ? 0.5 : (activeEffects.lightning ? 1.5 : 1);
-
+            // Simplified: only shield and heart items remain, no speed/size modifiers
+            const speedMult = 1;
             flappyBird.velocity += settings.gravity * speedMult;
             flappyBird.y += flappyBird.velocity * speedMult;
-            flappyBird.radius = activeEffects.shrink ? flappyBird.baseRadius * 0.6 : flappyBird.baseRadius;
-
+            flappyBird.radius = flappyBird.baseRadius;
             bgScrollX += 2 * speedMult;
 
             const spawnDist = Math.max(280, settings.spawnRate);
@@ -1690,7 +1751,7 @@
                 flappyPipes[i].x -= settings.pipeSpeed * speedMult;
                 if (!flappyPipes[i].passed && flappyPipes[i].x + PIPE_WIDTH < flappyBird.x) {
                     flappyPipes[i].passed = true;
-                    flappyScore += activeEffects.double ? 2 : 1;
+                    flappyScore += 1;
                     document.getElementById('flappy-score').textContent = flappyScore;
                     updateLevel();
                 }
@@ -1727,12 +1788,8 @@
         function collectItem(item) {
             const descriptions = {
                 shield: '🛡️ KHIÊN BẢO VỆ!',
-                slowmo: '⏳ CHẬM LẠI 5s!',
-                double: '⭐ ĐIỂM x2 trong 5s!',
-                shrink: '💎 THU NHỎ 5s!',
                 heart: '💖 +1 MẠNG!',
-                bomb: '💣 BOM!',
-                lightning: '⚡ TĂNG TỐC 3s!'
+                bomb: '💣 BOM!'
             };
 
             showItemPopup(descriptions[item.type] || item.type, item.color, item.x, item.y);
@@ -1743,17 +1800,15 @@
                 } else if (item.type === 'heart') {
                     playerLives++;
                     updateLivesUI();
-                } else {
-                    activeEffects[item.type] = Date.now() + item.duration;
                 }
                 updateEffectsUI();
             } else {
-                // Bad items - shield blocks ALL bad items
+                // Bad items - shield blocks bomb
                 if (activeEffects.shield) {
                     activeEffects.shield = false;
                     showItemPopup('🛡️ Chặn!', '#00ff7f', item.x, item.y);
                     updateEffectsUI();
-                    return; // Shield blocked, don't apply bad effect
+                    return;
                 }
 
                 if (item.type === 'bomb') {
@@ -1764,18 +1819,6 @@
                     } else {
                         gameOver();
                     }
-                } else if (item.type === 'lightning') {
-                    activeEffects.lightning = Date.now() + 3000;
-                    showItemPopup('⚡ TĂNG TỐC!', '#ffff00', item.x, item.y);
-                    updateEffectsUI();
-                } else if (item.type === 'freeze') {
-                    activeEffects.freeze = Date.now() + 3000;
-                    showItemPopup('🥶 ĐÓNG BĂNG!', '#00ffff', item.x, item.y);
-                    updateEffectsUI();
-                } else if (item.type === 'dizzy') {
-                    activeEffects.dizzy = Date.now() + 3000;
-                    showItemPopup('😵 CHÓNG MẶT!', '#ff00ff', item.x, item.y);
-                    updateEffectsUI();
                 }
             }
         }
@@ -1786,15 +1829,8 @@
         }
 
         function updateEffects() {
-            const now = Date.now();
-            let changed = false;
-            for (const key of ['slowmo', 'double', 'shrink', 'lightning']) {
-                if (activeEffects[key] && activeEffects[key] < now) {
-                    delete activeEffects[key];
-                    changed = true;
-                }
-            }
-            if (changed) updateEffectsUI();
+            // No timed global effects in the simplified mode; shield is handled when consumed.
+            return;
         }
 
         function updateEffectsUI() {
@@ -1802,15 +1838,6 @@
             container.innerHTML = '';
             if (activeEffects.shield) {
                 container.innerHTML += '<div class="effect-badge" style="border-color:#00ff7f;color:#00ff7f;">🛡️ Shield</div>';
-            }
-            for (const [key, endTime] of Object.entries(activeEffects)) {
-                if (key === 'shield') continue;
-                const remaining = Math.ceil((endTime - Date.now()) / 1000);
-                if (remaining > 0) {
-                    const icons = { slowmo: '⏳', double: '⭐', shrink: '💎', lightning: '⚡' };
-                    const colors = { slowmo: '#87ceeb', double: '#ffd700', shrink: '#ff69b4', lightning: '#ffff00' };
-                    container.innerHTML += `<div class="effect-badge" style="border-color:${colors[key]};color:${colors[key]};">${icons[key]} ${remaining}s</div>`;
-                }
             }
         }
 
