@@ -1351,6 +1351,17 @@
         <div id="flappy-score">0</div>
         <canvas id="flappy-canvas"></canvas>
         <div id="active-effects"></div>
+        <div id="beat-indicator"
+            style="position:fixed;top:80px;left:50%;transform:translateX(-50%);display:none;z-index:999;">
+            <div style="background:rgba(0,0,0,0.7);padding:8px 20px;border-radius:20px;text-align:center;">
+                <div style="color:#00ff7f;font-size:12px;margin-bottom:5px;">🎵 BEAT</div>
+                <div id="beat-bar" style="width:100px;height:10px;background:#333;border-radius:5px;overflow:hidden;">
+                    <div id="beat-fill"
+                        style="width:0%;height:100%;background:linear-gradient(90deg,#ff1493,#00ff7f);transition:width 0.05s;">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="flappy-instructions">
             <h2>💖 Flappy Heart Pro 💖</h2>
             <p>Nhấn <b>SPACE</b> hoặc <b>CLICK</b> để bay</p>
@@ -2081,8 +2092,9 @@
                 musicBtn.style.color = 'white';
                 normalBtn.style.background = 'transparent';
                 normalBtn.style.color = '#aaa';
-                modeDesc.textContent = '🎵 Nhịp Nhạc - ống và tốc độ sync theo beat Spotify!';
+                modeDesc.textContent = '🎵 Nhịp Nhạc - ống và tốc độ sync theo beat!';
                 modeDesc.style.color = '#00ff7f';
+                document.getElementById('beat-indicator').style.display = 'block';
             } else {
                 normalBtn.style.background = 'linear-gradient(135deg,#ff1493,#8a2be2)';
                 normalBtn.style.color = 'white';
@@ -2090,6 +2102,7 @@
                 musicBtn.style.color = '#aaa';
                 modeDesc.textContent = 'Chế độ thường - không sync nhạc';
                 modeDesc.style.color = '#888';
+                document.getElementById('beat-indicator').style.display = 'none';
             }
         }
 
@@ -2417,7 +2430,21 @@
             if (!flappyRunning) return;
             const settings = getGameSettings();
             // Music beat sync - only when enabled
-            const musicPulse = (musicSyncEnabled && typeof beatIntensity !== 'undefined') ? beatIntensity : 0;
+            let musicPulse = 0;
+            if (musicSyncEnabled) {
+                // Use Spotify beat if available, otherwise simulate beat (~120 BPM)
+                if (typeof beatIntensity !== 'undefined' && beatIntensity > 0) {
+                    musicPulse = beatIntensity;
+                } else {
+                    // Simulated beat: pulses every ~0.5 seconds (~120 BPM)
+                    const t = Date.now() / 1000;
+                    const beatPhase = (t * 2) % 1; // 2 beats per second
+                    musicPulse = beatPhase < 0.15 ? 1 - beatPhase * 6 : 0; // Sharp pulse
+                }
+            }
+            // Update beat indicator bar
+            const beatFill = document.getElementById('beat-fill');
+            if (beatFill) beatFill.style.width = (musicPulse * 100) + '%';
             const speedMult = 1 + musicPulse * 0.3;
             flappyBird.velocity += settings.gravity * speedMult;
             flappyBird.y += flappyBird.velocity * speedMult;
@@ -2665,7 +2692,16 @@
             }
 
             // MUSIC BEAT FLASH - intense glow on beats
-            const musicPulse = (musicSyncEnabled && typeof beatIntensity !== 'undefined') ? beatIntensity : 0;
+            let musicPulse = 0;
+            if (musicSyncEnabled) {
+                if (typeof beatIntensity !== 'undefined' && beatIntensity > 0) {
+                    musicPulse = beatIntensity;
+                } else {
+                    const t = Date.now() / 1000;
+                    const beatPhase = (t * 2) % 1;
+                    musicPulse = beatPhase < 0.15 ? 1 - beatPhase * 6 : 0;
+                }
+            }
             if (musicPulse > 0.3) {
                 const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
                 flashGrad.addColorStop(0, `rgba(255, 20, 147, ${musicPulse * 0.4})`);
