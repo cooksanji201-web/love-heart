@@ -2675,6 +2675,7 @@
 
         function drawFlappy() {
             const ctx = flappyCtx, w = flappyCanvas.width, h = flappyCanvas.height;
+            const time = Date.now() / 1000; // Define time for all beat calculations
             ctx.clearRect(0, 0, w, h);
 
             // Sky gradient - ALL THEMES use dark purple base for consistency
@@ -2839,7 +2840,6 @@
             }
 
             // Stars with twinkle
-            const time = Date.now() / 1000;
             stars.forEach(s => {
                 const baseBright = 0.5 + Math.sin(time * 3 + s.twinkle) * 0.5;
                 const brightness = baseBright + musicPulse * 0.5; // Stars pulse brighter with beat
