@@ -1351,65 +1351,13 @@
         <div id="flappy-score">0</div>
         <canvas id="flappy-canvas"></canvas>
         <div id="active-effects"></div>
-        <div id="beat-indicator"
-            style="position:fixed;top:80px;left:50%;transform:translateX(-50%);display:none;z-index:999;">
-            <div
-                style="background:rgba(0,0,0,0.9);padding:15px 25px;border-radius:20px;text-align:center;border:1px solid rgba(255,105,180,0.4);">
-                <div style="color:#00ff7f;font-size:12px;margin-bottom:8px;">🎵 BEAT SYNC - Nhập BPM bài hát</div>
-                <div id="beat-bar"
-                    style="width:150px;height:14px;background:#222;border-radius:7px;overflow:hidden;margin-bottom:10px;">
-                    <div id="beat-fill"
-                        style="width:0%;height:100%;background:linear-gradient(90deg,#ff1493,#00ff7f);transition:width 0.08s;">
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px;">
-                    <span style="color:#aaa;font-size:11px;">BPM:</span>
-                    <input type="number" id="bpm-input" min="60" max="200" value="120" onchange="setBPM(this.value)"
-                        oninput="setBPM(this.value)"
-                        style="width:60px;padding:5px;border-radius:10px;border:1px solid #ff1493;background:#111;color:#fff;text-align:center;font-size:14px;">
-                    <button onclick="startBeatSync()" id="sync-btn"
-                        style="padding:6px 14px;border-radius:15px;border:none;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-size:12px;font-weight:bold;">
-                        ▶️ BẮT ĐẦU
-                    </button>
-                </div>
-                <div style="display:flex;gap:5px;justify-content:center;margin-bottom:8px;">
-                    <button onclick="setBPM(80)"
-                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">80</button>
-                    <button onclick="setBPM(100)"
-                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">100</button>
-                    <button onclick="setBPM(120)"
-                        style="padding:3px 8px;border-radius:8px;border:1px solid #ff1493;background:#331;color:#ff1493;cursor:pointer;font-size:10px;">120</button>
-                    <button onclick="setBPM(140)"
-                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">140</button>
-                    <button onclick="setBPM(160)"
-                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">160</button>
-                </div>
-                <div style="display:flex;gap:10px;justify-content:center;align-items:center;">
-                    <button onclick="tapBPM()" id="tap-btn"
-                        style="padding:5px 12px;border-radius:12px;border:1px solid #00ff7f;background:transparent;color:#00ff7f;cursor:pointer;font-size:11px;">
-                        👆 TAP để đo BPM
-                    </button>
-                    <span id="tap-count" style="color:#666;font-size:10px;"></span>
-                </div>
-                <div id="music-status" style="font-size:10px;color:#888;margin-top:8px;">Google: "tên bài + BPM" để tìm
-                </div>
-            </div>
-        </div>
+        <!-- Beat indicator removed - using normal mode only -->
         <div id="flappy-instructions">
             <h2>💖 Flappy Heart Pro 💖</h2>
             <p>Nhấn <b>SPACE</b> hoặc <b>CLICK</b> để bay</p>
             <p>Tránh các cột và vật cản để ghi điểm!</p>
             <p style="margin-top:10px;color:#00ff7f;">💚 Ăn power-ups để nhận buff</p>
             <p style="color:#ff4444;">❌ Tránh obstacles nguy hiểm</p>
-            <div style="margin-top:15px;display:flex;gap:10px;justify-content:center;">
-                <button id="mode-normal-btn" onclick="setGameMode('normal')"
-                    style="padding:8px 16px;border-radius:20px;border:2px solid #ff69b4;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-weight:bold;">🎮
-                    Thường</button>
-                <button id="mode-music-btn" onclick="setGameMode('music')"
-                    style="padding:8px 16px;border-radius:20px;border:2px solid #00ff7f;background:transparent;color:#aaa;cursor:pointer;font-weight:bold;">🎵
-                    Nhịp Nhạc</button>
-            </div>
-            <p id="mode-desc" style="margin-top:10px;font-size:12px;color:#888;">Chế độ thường - không sync nhạc</p>
             <p style="margin-top: 20px; color: #ffd700;">Nhấn để bắt đầu...</p>
         </div>
         <div id="game-over-screen">
