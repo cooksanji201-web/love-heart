@@ -2691,7 +2691,7 @@
                 themeTransition = Math.max(0, themeTransition - 0.02);
             }
 
-            // MUSIC BEAT FLASH - intense glow on beats
+            // MUSIC BEAT EFFECTS - Theme-specific visual responses to beats
             let musicPulse = 0;
             if (musicSyncEnabled) {
                 if (typeof beatIntensity !== 'undefined' && beatIntensity > 0) {
@@ -2702,13 +2702,171 @@
                     musicPulse = beatPhase < 0.15 ? 1 - beatPhase * 6 : 0;
                 }
             }
-            if (musicPulse > 0.3) {
-                const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h));
-                flashGrad.addColorStop(0, `rgba(255, 20, 147, ${musicPulse * 0.4})`);
-                flashGrad.addColorStop(0.5, `rgba(138, 43, 226, ${musicPulse * 0.2})`);
-                flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                ctx.fillStyle = flashGrad;
-                ctx.fillRect(0, 0, w, h);
+
+            // Theme-specific beat effects instead of generic flash
+            if (musicPulse > 0.2) {
+                if (currentTheme === 'city') {
+                    // City: Neon light streaks from buildings, window glow bursts
+                    for (let i = 0; i < 8; i++) {
+                        const nx = Math.random() * w;
+                        const ny = h - Math.random() * 200;
+                        ctx.beginPath();
+                        ctx.moveTo(nx, ny);
+                        ctx.lineTo(nx + (Math.random() - 0.5) * 30, ny - 50 - Math.random() * 100);
+                        ctx.strokeStyle = `rgba(255, 105, 180, ${musicPulse * 0.6})`;
+                        ctx.lineWidth = 2 + musicPulse * 3;
+                        ctx.stroke();
+                    }
+                    // Neon glow at bottom
+                    const neonGrad = ctx.createLinearGradient(0, h, 0, h - 150);
+                    neonGrad.addColorStop(0, `rgba(255, 20, 147, ${musicPulse * 0.5})`);
+                    neonGrad.addColorStop(0.5, `rgba(138, 43, 226, ${musicPulse * 0.3})`);
+                    neonGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    ctx.fillStyle = neonGrad;
+                    ctx.fillRect(0, h - 150, w, 150);
+
+                } else if (currentTheme === 'forest') {
+                    // Forest: Firefly bursts, magical sparkles
+                    for (let i = 0; i < Math.floor(musicPulse * 20); i++) {
+                        const fx = Math.random() * w;
+                        const fy = Math.random() * h * 0.8;
+                        const fsize = 3 + Math.random() * 5 + musicPulse * 4;
+                        ctx.beginPath();
+                        ctx.arc(fx, fy, fsize, 0, Math.PI * 2);
+                        const glowGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, fsize * 2);
+                        glowGrad.addColorStop(0, `rgba(180, 255, 100, ${musicPulse * 0.9})`);
+                        glowGrad.addColorStop(0.5, `rgba(100, 200, 50, ${musicPulse * 0.5})`);
+                        glowGrad.addColorStop(1, 'rgba(0, 100, 0, 0)');
+                        ctx.fillStyle = glowGrad;
+                        ctx.fill();
+                    }
+                    // Moonlight pulse
+                    const moonGlow = ctx.createRadialGradient(w * 0.8, h * 0.15, 0, w * 0.8, h * 0.15, 150);
+                    moonGlow.addColorStop(0, `rgba(255, 255, 200, ${musicPulse * 0.4})`);
+                    moonGlow.addColorStop(0.5, `rgba(200, 200, 150, ${musicPulse * 0.2})`);
+                    moonGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    ctx.fillStyle = moonGlow;
+                    ctx.beginPath();
+                    ctx.arc(w * 0.8, h * 0.15, 150, 0, Math.PI * 2);
+                    ctx.fill();
+
+                } else if (currentTheme === 'sakura') {
+                    // Sakura: Lantern glow, floating petal trails
+                    for (let i = 0; i < Math.floor(musicPulse * 12); i++) {
+                        const lx = Math.random() * w;
+                        const ly = 50 + Math.random() * h * 0.4;
+                        ctx.beginPath();
+                        ctx.arc(lx, ly, 15 + musicPulse * 10, 0, Math.PI * 2);
+                        const lanternGrad = ctx.createRadialGradient(lx, ly, 0, lx, ly, 25);
+                        lanternGrad.addColorStop(0, `rgba(255, 200, 100, ${musicPulse * 0.8})`);
+                        lanternGrad.addColorStop(0.4, `rgba(255, 150, 80, ${musicPulse * 0.5})`);
+                        lanternGrad.addColorStop(1, 'rgba(200, 50, 50, 0)');
+                        ctx.fillStyle = lanternGrad;
+                        ctx.fill();
+                    }
+                    // Pink ambient glow
+                    const sakuraGlow = ctx.createRadialGradient(w / 2, h / 3, 0, w / 2, h / 3, w * 0.6);
+                    sakuraGlow.addColorStop(0, `rgba(255, 182, 193, ${musicPulse * 0.2})`);
+                    sakuraGlow.addColorStop(1, 'rgba(255, 105, 180, 0)');
+                    ctx.fillStyle = sakuraGlow;
+                    ctx.fillRect(0, 0, w, h);
+
+                } else if (currentTheme === 'ocean') {
+                    // Ocean: Bioluminescent waves, jellyfish glow
+                    for (let i = 0; i < Math.floor(musicPulse * 15); i++) {
+                        const ox = Math.random() * w;
+                        const oy = Math.random() * h;
+                        const osize = 5 + Math.random() * 15 + musicPulse * 8;
+                        ctx.beginPath();
+                        ctx.arc(ox, oy, osize, 0, Math.PI * 2);
+                        const bioGrad = ctx.createRadialGradient(ox, oy, 0, ox, oy, osize);
+                        bioGrad.addColorStop(0, `rgba(0, 255, 255, ${musicPulse * 0.7})`);
+                        bioGrad.addColorStop(0.5, `rgba(0, 150, 200, ${musicPulse * 0.4})`);
+                        bioGrad.addColorStop(1, 'rgba(0, 50, 100, 0)');
+                        ctx.fillStyle = bioGrad;
+                        ctx.fill();
+                    }
+                    // Wave light at bottom
+                    ctx.beginPath();
+                    for (let x = 0; x <= w; x += 20) {
+                        const waveY = h - 50 + Math.sin(x * 0.02 + time * 3) * 20 * musicPulse;
+                        if (x === 0) ctx.moveTo(x, waveY);
+                        else ctx.lineTo(x, waveY);
+                    }
+                    ctx.lineTo(w, h);
+                    ctx.lineTo(0, h);
+                    ctx.closePath();
+                    const waveGrad = ctx.createLinearGradient(0, h - 100, 0, h);
+                    waveGrad.addColorStop(0, `rgba(0, 200, 255, ${musicPulse * 0.4})`);
+                    waveGrad.addColorStop(1, `rgba(0, 100, 150, ${musicPulse * 0.2})`);
+                    ctx.fillStyle = waveGrad;
+                    ctx.fill();
+
+                } else if (currentTheme === 'space') {
+                    // Space: Nebula pulses, shooting stars
+                    for (let i = 0; i < Math.floor(musicPulse * 6); i++) {
+                        const sx = Math.random() * w;
+                        const sy = Math.random() * h * 0.6;
+                        const len = 50 + Math.random() * 100;
+                        ctx.beginPath();
+                        ctx.moveTo(sx, sy);
+                        ctx.lineTo(sx - len, sy + len * 0.3);
+                        const starGrad = ctx.createLinearGradient(sx, sy, sx - len, sy + len * 0.3);
+                        starGrad.addColorStop(0, `rgba(255, 255, 255, ${musicPulse * 0.9})`);
+                        starGrad.addColorStop(0.5, `rgba(200, 200, 255, ${musicPulse * 0.5})`);
+                        starGrad.addColorStop(1, 'rgba(100, 100, 200, 0)');
+                        ctx.strokeStyle = starGrad;
+                        ctx.lineWidth = 2 + musicPulse * 2;
+                        ctx.stroke();
+                    }
+                    // Nebula glow
+                    const nebulaColors = [
+                        { x: w * 0.3, y: h * 0.3, color: 'rgba(147, 112, 219,' },
+                        { x: w * 0.7, y: h * 0.5, color: 'rgba(255, 105, 180,' },
+                        { x: w * 0.5, y: h * 0.2, color: 'rgba(0, 191, 255,' }
+                    ];
+                    nebulaColors.forEach(n => {
+                        const nGrad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 200);
+                        nGrad.addColorStop(0, n.color + (musicPulse * 0.3) + ')');
+                        nGrad.addColorStop(1, n.color + '0)');
+                        ctx.fillStyle = nGrad;
+                        ctx.beginPath();
+                        ctx.arc(n.x, n.y, 200, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                } else if (currentTheme === 'tet') {
+                    // Tet: Firework sparkles, red-gold lantern glow
+                    for (let i = 0; i < Math.floor(musicPulse * 25); i++) {
+                        const fx = Math.random() * w;
+                        const fy = Math.random() * h * 0.5;
+                        const fsize = 2 + Math.random() * 4;
+                        const fcolor = Math.random() > 0.5 ?
+                            `rgba(255, 215, 0, ${musicPulse * 0.9})` :
+                            `rgba(255, 50, 50, ${musicPulse * 0.9})`;
+                        ctx.beginPath();
+                        ctx.arc(fx, fy, fsize, 0, Math.PI * 2);
+                        ctx.fillStyle = fcolor;
+                        ctx.fill();
+                        // Sparkle rays
+                        for (let r = 0; r < 4; r++) {
+                            const angle = r * Math.PI / 2 + time * 2;
+                            ctx.beginPath();
+                            ctx.moveTo(fx, fy);
+                            ctx.lineTo(fx + Math.cos(angle) * 10, fy + Math.sin(angle) * 10);
+                            ctx.strokeStyle = fcolor;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                    // Red-gold gradient at top for prosperity
+                    const tetGrad = ctx.createLinearGradient(0, 0, 0, 200);
+                    tetGrad.addColorStop(0, `rgba(255, 50, 0, ${musicPulse * 0.3})`);
+                    tetGrad.addColorStop(0.5, `rgba(255, 180, 0, ${musicPulse * 0.2})`);
+                    tetGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                    ctx.fillStyle = tetGrad;
+                    ctx.fillRect(0, 0, w, 200);
+                }
             }
 
             // Stars with twinkle
@@ -2837,14 +2995,30 @@
                             ctx.strokeStyle = `rgba(255, 105, 180, ${0.1 + layer * 0.1})`;
                             ctx.lineWidth = 1;
                             ctx.strokeRect(bx, by, b.width, b.height);
-                            // Windows
+                            // Windows - REACT TO MUSIC BEAT
                             const winW = 6, winH = 10, winGap = 18;
                             for (let row = 0; row < Math.min(b.windows || 0, Math.floor((b.height - 20) / winGap)); row++) {
                                 for (let col = 0; col < 3; col++) {
                                     const wx = bx + 8 + col * (b.width - 20) / 3;
                                     const wy = by + 12 + row * winGap;
-                                    const lit = Math.sin(b.x + row * 5 + col * 7 + time) > 0.3;
-                                    ctx.fillStyle = lit ? `rgba(255, 200, 100, ${0.4 + layer * 0.2})` : 'rgba(20, 10, 30, 0.8)';
+                                    // More windows lit during beat, and glow stronger
+                                    const beatBoost = musicPulse * 0.5; // Beat makes more windows light up
+                                    const lit = Math.sin(b.x + row * 5 + col * 7 + time) > (0.3 - beatBoost);
+                                    const beatGlow = musicPulse * 0.6; // Extra brightness from beat
+                                    if (lit) {
+                                        // Windows glow with beat intensity
+                                        const winGrad = ctx.createRadialGradient(wx + winW / 2, wy + winH / 2, 0, wx + winW / 2, wy + winH / 2, winW + beatGlow * 10);
+                                        winGrad.addColorStop(0, `rgba(255, 220, 150, ${0.6 + layer * 0.2 + beatGlow})`);
+                                        winGrad.addColorStop(0.6, `rgba(255, 180, 100, ${0.3 + beatGlow * 0.5})`);
+                                        winGrad.addColorStop(1, 'rgba(255, 100, 50, 0)');
+                                        ctx.fillStyle = winGrad;
+                                        ctx.beginPath();
+                                        ctx.arc(wx + winW / 2, wy + winH / 2, winW / 2 + beatGlow * 5, 0, Math.PI * 2);
+                                        ctx.fill();
+                                        ctx.fillStyle = `rgba(255, 200, 100, ${0.5 + layer * 0.2 + beatGlow})`;
+                                    } else {
+                                        ctx.fillStyle = 'rgba(20, 10, 30, 0.8)';
+                                    }
                                     ctx.fillRect(wx, wy, winW, winH);
                                 }
                             }
@@ -2858,12 +3032,48 @@
                 }
             }
 
-            // Floating objects - react to music beat
+            // Floating objects - react to music beat with glow effects
             floatingObjs.forEach(obj => {
                 const ox = ((obj.x - bgScrollX * obj.speed * 0.5) % (w + 200) + w + 200) % (w + 200) - 100;
                 const beatWobble = musicPulse * 30; // Extra wobble on beat
                 const oy = obj.y + Math.sin(time * 2 + obj.wobble) * (15 + beatWobble);
                 const beatSize = obj.size * (1 + musicPulse * 0.5); // Objects grow on beat
+
+                // Add glow effect behind objects during beat
+                if (musicPulse > 0.2) {
+                    ctx.beginPath();
+                    ctx.arc(ox, oy, beatSize * 0.8, 0, Math.PI * 2);
+                    const objGlow = ctx.createRadialGradient(ox, oy, 0, ox, oy, beatSize);
+                    // Theme-specific glow colors
+                    let glowColor1, glowColor2;
+                    if (currentTheme === 'city') {
+                        glowColor1 = `rgba(255, 20, 147, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(138, 43, 226, 0)';
+                    } else if (currentTheme === 'forest') {
+                        glowColor1 = `rgba(150, 255, 100, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(0, 100, 0, 0)';
+                    } else if (currentTheme === 'sakura') {
+                        glowColor1 = `rgba(255, 182, 193, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(255, 105, 180, 0)';
+                    } else if (currentTheme === 'ocean') {
+                        glowColor1 = `rgba(0, 255, 255, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(0, 100, 150, 0)';
+                    } else if (currentTheme === 'space') {
+                        glowColor1 = `rgba(200, 150, 255, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(50, 0, 100, 0)';
+                    } else if (currentTheme === 'tet') {
+                        glowColor1 = `rgba(255, 200, 0, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(255, 50, 0, 0)';
+                    } else {
+                        glowColor1 = `rgba(255, 105, 180, ${musicPulse * 0.6})`;
+                        glowColor2 = 'rgba(0, 0, 0, 0)';
+                    }
+                    objGlow.addColorStop(0, glowColor1);
+                    objGlow.addColorStop(1, glowColor2);
+                    ctx.fillStyle = objGlow;
+                    ctx.fill();
+                }
+
                 ctx.font = beatSize + 'px serif';
                 ctx.fillText(obj.type, ox, oy);
             });
