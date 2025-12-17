@@ -1354,23 +1354,45 @@
         <div id="beat-indicator"
             style="position:fixed;top:80px;left:50%;transform:translateX(-50%);display:none;z-index:999;">
             <div
-                style="background:rgba(0,0,0,0.85);padding:12px 20px;border-radius:20px;text-align:center;border:1px solid rgba(255,105,180,0.3);">
-                <div style="color:#00ff7f;font-size:12px;margin-bottom:5px;">🎵 BEAT SYNC</div>
+                style="background:rgba(0,0,0,0.9);padding:15px 25px;border-radius:20px;text-align:center;border:1px solid rgba(255,105,180,0.4);">
+                <div style="color:#00ff7f;font-size:12px;margin-bottom:8px;">🎵 BEAT SYNC - Nhập BPM bài hát</div>
                 <div id="beat-bar"
-                    style="width:120px;height:12px;background:#222;border-radius:6px;overflow:hidden;margin-bottom:8px;">
+                    style="width:150px;height:14px;background:#222;border-radius:7px;overflow:hidden;margin-bottom:10px;">
                     <div id="beat-fill"
-                        style="width:0%;height:100%;background:linear-gradient(90deg,#ff1493,#00ff7f);transition:width 0.05s;">
+                        style="width:0%;height:100%;background:linear-gradient(90deg,#ff1493,#00ff7f);transition:width 0.08s;">
                     </div>
                 </div>
-                <div style="display:flex;gap:8px;align-items:center;justify-content:center;">
-                    <button id="music-play-btn" onclick="toggleMusicPlayback()"
-                        style="padding:6px 12px;border-radius:15px;border:none;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-size:14px;">
-                        ▶️ Phát Nhạc
+                <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px;">
+                    <span style="color:#aaa;font-size:11px;">BPM:</span>
+                    <input type="number" id="bpm-input" min="60" max="200" value="120" onchange="setBPM(this.value)"
+                        oninput="setBPM(this.value)"
+                        style="width:60px;padding:5px;border-radius:10px;border:1px solid #ff1493;background:#111;color:#fff;text-align:center;font-size:14px;">
+                    <button onclick="startBeatSync()" id="sync-btn"
+                        style="padding:6px 14px;border-radius:15px;border:none;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-size:12px;font-weight:bold;">
+                        ▶️ BẮT ĐẦU
                     </button>
-                    <input type="range" min="0" max="100" value="50" onchange="setMusicVolume(this.value)"
-                        style="width:60px;accent-color:#ff1493;">
                 </div>
-                <div id="music-status" style="font-size:10px;color:#888;margin-top:5px;">Nhấn để phát audio.mp3</div>
+                <div style="display:flex;gap:5px;justify-content:center;margin-bottom:8px;">
+                    <button onclick="setBPM(80)"
+                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">80</button>
+                    <button onclick="setBPM(100)"
+                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">100</button>
+                    <button onclick="setBPM(120)"
+                        style="padding:3px 8px;border-radius:8px;border:1px solid #ff1493;background:#331;color:#ff1493;cursor:pointer;font-size:10px;">120</button>
+                    <button onclick="setBPM(140)"
+                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">140</button>
+                    <button onclick="setBPM(160)"
+                        style="padding:3px 8px;border-radius:8px;border:1px solid #666;background:#222;color:#aaa;cursor:pointer;font-size:10px;">160</button>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:center;align-items:center;">
+                    <button onclick="tapBPM()" id="tap-btn"
+                        style="padding:5px 12px;border-radius:12px;border:1px solid #00ff7f;background:transparent;color:#00ff7f;cursor:pointer;font-size:11px;">
+                        👆 TAP để đo BPM
+                    </button>
+                    <span id="tap-count" style="color:#666;font-size:10px;"></span>
+                </div>
+                <div id="music-status" style="font-size:10px;color:#888;margin-top:8px;">Google: "tên bài + BPM" để tìm
+                </div>
             </div>
         </div>
         <div id="flappy-instructions">
@@ -1771,6 +1793,119 @@
         function setMusicVolume(val) {
             if (audioElement) {
                 audioElement.volume = val / 100;
+            }
+        }
+
+        // ============================================
+        // BPM SYNC SYSTEM - Manual BPM input for Spotify
+        // ============================================
+        let currentBPM = 120;
+        let bpmSyncActive = false;
+        let bpmStartTime = 0;
+        let tapTimes = [];
+        const TAP_TIMEOUT = 2000; // Reset taps after 2 seconds
+
+        function setBPM(bpm) {
+            currentBPM = Math.max(60, Math.min(200, parseInt(bpm) || 120));
+            const input = document.getElementById('bpm-input');
+            if (input) input.value = currentBPM;
+
+            const status = document.getElementById('music-status');
+            if (status && bpmSyncActive) {
+                status.textContent = `🎵 Đang sync theo ${currentBPM} BPM`;
+            }
+        }
+
+        function startBeatSync() {
+            bpmSyncActive = !bpmSyncActive;
+            bpmStartTime = Date.now();
+
+            const btn = document.getElementById('sync-btn');
+            const status = document.getElementById('music-status');
+
+            if (bpmSyncActive) {
+                if (btn) btn.textContent = '⏹️ DỪNG';
+                if (btn) btn.style.background = 'linear-gradient(135deg,#00ff7f,#00aa55)';
+                if (status) {
+                    status.textContent = `🎵 Đang sync ${currentBPM} BPM - Phát nhạc Spotify của bạn!`;
+                    status.style.color = '#00ff7f';
+                }
+            } else {
+                if (btn) btn.textContent = '▶️ BẮT ĐẦU';
+                if (btn) btn.style.background = 'linear-gradient(135deg,#ff1493,#8a2be2)';
+                if (status) {
+                    status.textContent = 'Đã dừng - Google "tên bài + BPM" để tìm';
+                    status.style.color = '#888';
+                }
+                beatIntensity = 0;
+            }
+        }
+
+        // Tap tempo - tap along with music to detect BPM
+        function tapBPM() {
+            const now = Date.now();
+
+            // Reset if too long since last tap
+            if (tapTimes.length > 0 && (now - tapTimes[tapTimes.length - 1]) > TAP_TIMEOUT) {
+                tapTimes = [];
+            }
+
+            tapTimes.push(now);
+
+            // Need at least 2 taps to calculate BPM
+            if (tapTimes.length >= 2) {
+                // Calculate average interval between taps
+                let totalInterval = 0;
+                for (let i = 1; i < tapTimes.length; i++) {
+                    totalInterval += tapTimes[i] - tapTimes[i - 1];
+                }
+                const avgInterval = totalInterval / (tapTimes.length - 1);
+                const detectedBPM = Math.round(60000 / avgInterval);
+
+                // Clamp to reasonable range
+                if (detectedBPM >= 60 && detectedBPM <= 200) {
+                    setBPM(detectedBPM);
+                }
+
+                // Show tap count
+                const tapCount = document.getElementById('tap-count');
+                if (tapCount) tapCount.textContent = `${tapTimes.length} taps → ${detectedBPM} BPM`;
+            }
+
+            // Keep only last 8 taps
+            if (tapTimes.length > 8) tapTimes.shift();
+
+            // Visual feedback
+            const btn = document.getElementById('tap-btn');
+            if (btn) {
+                btn.style.background = '#00ff7f';
+                btn.style.color = '#000';
+                setTimeout(() => {
+                    btn.style.background = 'transparent';
+                    btn.style.color = '#00ff7f';
+                }, 100);
+            }
+        }
+
+        // Generate beat based on BPM timing
+        function generateBPMBeat() {
+            if (!bpmSyncActive || !musicSyncEnabled) {
+                return;
+            }
+
+            const now = Date.now();
+            const beatInterval = 60000 / currentBPM; // ms per beat
+            const elapsed = now - bpmStartTime;
+            const beatPhase = (elapsed % beatInterval) / beatInterval; // 0-1 within each beat
+
+            // Sharp attack, gradual decay for each beat
+            if (beatPhase < 0.15) {
+                // Attack phase - quick rise
+                beatIntensity = 0.6 + (1 - beatPhase / 0.15) * 0.4;
+            } else {
+                // Decay phase
+                const decayPhase = (beatPhase - 0.15) / 0.85;
+                beatIntensity = 0.6 * Math.pow(1 - decayPhase, 2);
             }
         }
 
@@ -2537,21 +2672,30 @@
             const settings = getGameSettings();
             const time = Date.now() / 1000;
 
-            // REAL beat detection from Web Audio API
-            if (musicSyncEnabled && isAudioPlaying) {
-                analyzeAudio(); // Analyze audio and set beatIntensity
+            // REAL beat detection from Web Audio API OR BPM sync
+            if (musicSyncEnabled) {
+                if (bpmSyncActive) {
+                    generateBPMBeat(); // Generate beat based on user BPM
+                } else if (isAudioPlaying) {
+                    analyzeAudio(); // Analyze audio.mp3 and set beatIntensity
+                }
             }
 
             // Music beat sync - only when enabled
             let musicPulse = 0;
             let smoothBeat = 0; // Continuous smooth wave for pipe movement
             if (musicSyncEnabled) {
-                // Use REAL beat from audio analysis if playing, otherwise simulate
-                if (isAudioPlaying && beatIntensity > 0) {
+                // Priority: 1) BPM sync, 2) Audio analysis, 3) Simulated
+                if (bpmSyncActive && beatIntensity > 0) {
+                    // BPM sync active - use generated beat
                     musicPulse = beatIntensity;
                     smoothBeat = beatIntensity;
-                } else if (!isAudioPlaying) {
-                    // Simulated beat only when no audio playing
+                } else if (isAudioPlaying && beatIntensity > 0) {
+                    // Audio file playing - use analyzed beat
+                    musicPulse = beatIntensity;
+                    smoothBeat = beatIntensity;
+                } else if (!bpmSyncActive && !isAudioPlaying) {
+                    // Fallback to simulated beat
                     smoothBeat = (Math.sin(time * Math.PI * 2) + 1) / 2;
                     const fastBeat = (Math.sin(time * Math.PI * 4) + 1) / 2;
                     musicPulse = smoothBeat * 0.7 + fastBeat * 0.3;
@@ -2836,13 +2980,27 @@
             // MUSIC BEAT EFFECTS - Theme-specific visual responses to beats
             let musicPulse = 0;
             if (musicSyncEnabled) {
-                // Use REAL beat from audio analysis
-                if (isAudioPlaying && beatIntensity > 0) {
+                // Priority: 1) BPM sync, 2) Audio analysis, 3) Simulated
+                if (bpmSyncActive && beatIntensity > 0) {
                     musicPulse = beatIntensity;
 
-                    // SPECIAL EFFECT: Flash when REAL beat detected (strong bass hit)
+                    // SPECIAL EFFECT: Flash on BPM beat (strong beat)
+                    if (beatIntensity > 0.7) {
+                        const flashRadius = 50 + beatIntensity * 120;
+                        const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, flashRadius);
+                        flashGrad.addColorStop(0, `rgba(255, 255, 255, ${beatIntensity * 0.35})`);
+                        flashGrad.addColorStop(0.4, `rgba(255, 105, 180, ${beatIntensity * 0.25})`);
+                        flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        ctx.fillStyle = flashGrad;
+                        ctx.beginPath();
+                        ctx.arc(w / 2, h / 2, flashRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (isAudioPlaying && beatIntensity > 0) {
+                    musicPulse = beatIntensity;
+
+                    // SPECIAL EFFECT: Flash when audio beat detected
                     if (beatIntensity > 0.5) {
-                        // Create a bright flash ring at center
                         const flashRadius = 50 + beatIntensity * 100;
                         const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, flashRadius);
                         flashGrad.addColorStop(0, `rgba(255, 255, 255, ${beatIntensity * 0.3})`);
@@ -2853,8 +3011,8 @@
                         ctx.arc(w / 2, h / 2, flashRadius, 0, Math.PI * 2);
                         ctx.fill();
                     }
-                } else if (!isAudioPlaying) {
-                    // Only use simulated beat when no audio
+                } else if (!bpmSyncActive && !isAudioPlaying) {
+                    // Fallback to simulated beat
                     const smoothBeat = (Math.sin(time * Math.PI * 2) + 1) / 2;
                     const fastBeat = (Math.sin(time * Math.PI * 4) + 1) / 2;
                     musicPulse = smoothBeat * 0.7 + fastBeat * 0.3;
