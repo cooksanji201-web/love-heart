@@ -1355,9 +1355,7 @@
         <div id="flappy-instructions">
             <h2>💖 Flappy Heart Pro 💖</h2>
             <p>Nhấn <b>SPACE</b> hoặc <b>CLICK</b> để bay</p>
-            <p>Tránh các cột và vật cản để ghi điểm!</p>
-            <p style="margin-top:10px;color:#00ff7f;">💚 Ăn power-ups để nhận buff</p>
-            <p style="color:#ff4444;">❌ Tránh obstacles nguy hiểm</p>
+            <p>Tránh các cột để ghi điểm!</p>
             <p style="margin-top: 20px; color: #ffd700;">Nhấn để bắt đầu...</p>
         </div>
         <div id="game-over-screen">
@@ -2381,13 +2379,8 @@
         }
 
         function showLevelTransition() {
-            // Simple toast without blur - less intrusive
-            const toast = document.getElementById('level-up-toast');
-            const themes = { city: '🌃', forest: '🌲', sakura: '🌸', ocean: '🌊', space: '🚀', tet: '🧧' };
-            const emoji = themes[currentTheme] || '🌃';
-            toast.textContent = `${emoji} Level ${currentLevel}!`;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 800);
+            // DISABLED - no level transition UI
+            return;
         }
 
         function updateLevel() {
@@ -2552,67 +2545,8 @@
             };
             flappyPipes.push(pipe);
 
-            // Item spawn: reduced frequency — spawn roughly every 6+ pipes
-            pipeCounter++;
-            const spawnThreshold = 6 + Math.floor(currentLevel / 6); // rarer items; slowly changes with level
-            if (pipeCounter >= spawnThreshold) {
-                pipeCounter = 0;
-
-                // Progressive difficulty using spawn counter for exact ratio
-                // Level 1-3: 3 good then 1 bad (75% good)
-                // Level 4-6: 2 good then 1 bad (66% good)
-                // Level 7-10: 1 good then 1 bad (50% good)
-                // Level 11+: 1 good then 2 bad (33% good)
-                itemAlternator++;
-                let isGood;
-                if (currentLevel <= 3) {
-                    isGood = (itemAlternator % 4) !== 0; // 3 good, 1 bad
-                } else if (currentLevel <= 6) {
-                    isGood = (itemAlternator % 3) !== 0; // 2 good, 1 bad
-                } else if (currentLevel <= 10) {
-                    isGood = (itemAlternator % 2) !== 0; // 1 good, 1 bad
-                } else {
-                    isGood = (itemAlternator % 3) === 1; // 1 good, 2 bad
-                }
-
-                // Select item avoiding last 4 used items
-                function selectWithNoRepeat(items) {
-                    const available = items.filter(item => !itemHistory.includes(item.type));
-                    const pool = available.length > 0 ? available : items;
-
-                    const totalWeight = pool.reduce((sum, item) => sum + item.rarity, 0);
-                    let random = Math.random() * totalWeight;
-                    for (const item of pool) {
-                        random -= item.rarity;
-                        if (random <= 0) {
-                            itemHistory.push(item.type);
-                            if (itemHistory.length > 5) itemHistory.shift(); // Wait 5 items before repeat
-                            return item;
-                        }
-                    }
-                    return pool[0];
-                }
-
-                if (isGood) {
-                    const powerup = selectWithNoRepeat(POWERUPS);
-                    gameItems.push({
-                        x: innerWidth + PIPE_WIDTH * 4, // Farther from pipe
-                        y: gapCenterY + (Math.random() - 0.5) * gap * 0.25,
-                        ...powerup, isGood: true, collected: false
-                    });
-                } else {
-                    const obstacle = selectWithNoRepeat(OBSTACLES);
-                    const atTop = Math.random() > 0.5;
-                    const obstacleY = atTop ?
-                        gapCenterY - gap * 0.35 - 15 - Math.random() * 30 :
-                        gapCenterY + gap * 0.35 + 15 + Math.random() * 30;
-                    gameItems.push({
-                        x: innerWidth + PIPE_WIDTH * 4, // Farther from pipe
-                        y: Math.max(50, Math.min(innerHeight - 50, obstacleY)),
-                        ...obstacle, isGood: false, collected: false
-                    });
-                }
-            }
+            // DISABLED - No items (powerups/obstacles)
+            // Item spawning has been disabled
         }
 
         function updateFlappy() {
