@@ -1353,13 +1353,24 @@
         <div id="active-effects"></div>
         <div id="beat-indicator"
             style="position:fixed;top:80px;left:50%;transform:translateX(-50%);display:none;z-index:999;">
-            <div style="background:rgba(0,0,0,0.7);padding:8px 20px;border-radius:20px;text-align:center;">
-                <div style="color:#00ff7f;font-size:12px;margin-bottom:5px;">🎵 BEAT</div>
-                <div id="beat-bar" style="width:100px;height:10px;background:#333;border-radius:5px;overflow:hidden;">
+            <div
+                style="background:rgba(0,0,0,0.85);padding:12px 20px;border-radius:20px;text-align:center;border:1px solid rgba(255,105,180,0.3);">
+                <div style="color:#00ff7f;font-size:12px;margin-bottom:5px;">🎵 BEAT SYNC</div>
+                <div id="beat-bar"
+                    style="width:120px;height:12px;background:#222;border-radius:6px;overflow:hidden;margin-bottom:8px;">
                     <div id="beat-fill"
                         style="width:0%;height:100%;background:linear-gradient(90deg,#ff1493,#00ff7f);transition:width 0.05s;">
                     </div>
                 </div>
+                <div style="display:flex;gap:8px;align-items:center;justify-content:center;">
+                    <button id="music-play-btn" onclick="toggleMusicPlayback()"
+                        style="padding:6px 12px;border-radius:15px;border:none;background:linear-gradient(135deg,#ff1493,#8a2be2);color:white;cursor:pointer;font-size:14px;">
+                        ▶️ Phát Nhạc
+                    </button>
+                    <input type="range" min="0" max="100" value="50" onchange="setMusicVolume(this.value)"
+                        style="width:60px;accent-color:#ff1493;">
+                </div>
+                <div id="music-status" style="font-size:10px;color:#888;margin-top:5px;">Nhấn để phát audio.mp3</div>
             </div>
         </div>
         <div id="flappy-instructions">
@@ -1617,58 +1628,153 @@
         function spotifyNext() { if (spotifyPlayer) spotifyPlayer.nextTrack(); }
         function spotifySetVolume(val) { if (spotifyPlayer) spotifyPlayer.setVolume(val / 100); }
 
-        // Audio Analysis for Beat Sync
-        let currentTrackId = null;
-        let audioAnalysis = null;
-        let beats = [];
-        let currentBeatIndex = 0;
+        // ============================================
+        // WEB AUDIO API - REAL BEAT DETECTION
+        // ============================================
+        let audioContext = null;
+        let audioAnalyser = null;
+        let audioSource = null;
+        let audioElement = null;
         let beatIntensity = 0; // 0-1 value for visual effects
+        let smoothedBeatForPipes = 0; // Smoothed value for pipe movement (lerp)
         let lastBeatTime = 0;
+        let bassHistory = [];
+        const BASS_HISTORY_SIZE = 30;
+        const BEAT_THRESHOLD = 1.3; // How much louder than average to trigger beat
+        const BEAT_COOLDOWN = 100; // Minimum ms between beats
+        let audioInitialized = false;
+        let isAudioPlaying = false;
 
-        async function fetchAudioAnalysis(trackId) {
-            if (!spotifyToken || trackId === currentTrackId) return;
-            currentTrackId = trackId;
+        // Create audio element for local file
+        function initAudioPlayer() {
+            if (audioInitialized) return;
+
+            audioElement = new Audio('./audio.mp3');
+            audioElement.crossOrigin = 'anonymous';
+            audioElement.loop = true;
+            audioElement.volume = 0.5;
+
+            audioElement.addEventListener('play', () => {
+                isAudioPlaying = true;
+                if (!audioContext) setupAudioAnalyser();
+            });
+
+            audioElement.addEventListener('pause', () => {
+                isAudioPlaying = false;
+            });
+
+            audioElement.addEventListener('ended', () => {
+                isAudioPlaying = false;
+            });
+
+            audioInitialized = true;
+            console.log('🎵 Audio player initialized with audio.mp3');
+        }
+
+        // Setup Web Audio API analyser
+        function setupAudioAnalyser() {
             try {
-                const response = await fetch(`https://api.spotify.com/v1/audio-analysis/${trackId}`, {
-                    headers: { 'Authorization': `Bearer ${spotifyToken}` }
-                });
-                if (response.ok) {
-                    audioAnalysis = await response.json();
-                    beats = audioAnalysis.beats || [];
-                    currentBeatIndex = 0;
-                    console.log(`🎵 Loaded ${beats.length} beats for track`);
-                }
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                audioAnalyser = audioContext.createAnalyser();
+                audioAnalyser.fftSize = 256;
+                audioAnalyser.smoothingTimeConstant = 0.3;
+
+                audioSource = audioContext.createMediaElementSource(audioElement);
+                audioSource.connect(audioAnalyser);
+                audioAnalyser.connect(audioContext.destination);
+
+                console.log('🎵 Audio analyser connected - REAL beat detection active!');
             } catch (e) {
-                console.log('Audio analysis not available:', e);
+                console.error('Error setting up audio analyser:', e);
             }
         }
 
-        function updateBeatSync(positionMs) {
-            if (!beats.length || !spotifyIsPlaying) {
-                beatIntensity *= 0.9; // Fade out
+        // Analyze audio and detect beats based on bass frequencies
+        function analyzeAudio() {
+            if (!audioAnalyser || !isAudioPlaying) {
+                beatIntensity *= 0.85; // Fade out when not playing
                 return;
             }
-            const positionSec = positionMs / 1000;
 
-            // Find current beat
-            while (currentBeatIndex < beats.length - 1 && beats[currentBeatIndex + 1].start < positionSec) {
-                currentBeatIndex++;
+            const bufferLength = audioAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            audioAnalyser.getByteFrequencyData(dataArray);
+
+            // Get bass energy (first 10 frequency bins ~ 0-860Hz)
+            let bassEnergy = 0;
+            const bassRange = 10;
+            for (let i = 0; i < bassRange; i++) {
+                bassEnergy += dataArray[i];
+            }
+            bassEnergy /= bassRange;
+
+            // Get mid energy for secondary beat detection
+            let midEnergy = 0;
+            for (let i = 10; i < 30; i++) {
+                midEnergy += dataArray[i];
+            }
+            midEnergy /= 20;
+
+            // Keep history for dynamic threshold
+            bassHistory.push(bassEnergy);
+            if (bassHistory.length > BASS_HISTORY_SIZE) bassHistory.shift();
+
+            // Calculate average bass energy
+            const avgBass = bassHistory.reduce((a, b) => a + b, 0) / bassHistory.length;
+
+            // Detect beat when bass spikes above threshold
+            const now = Date.now();
+            if (bassEnergy > avgBass * BEAT_THRESHOLD && (now - lastBeatTime) > BEAT_COOLDOWN) {
+                // Beat detected!
+                const intensity = Math.min(1, (bassEnergy - avgBass) / 100);
+                beatIntensity = 0.5 + intensity * 0.5; // 0.5-1.0 range
+                lastBeatTime = now;
+            } else {
+                // Smooth decay
+                beatIntensity *= 0.88;
             }
 
-            if (currentBeatIndex < beats.length) {
-                const beat = beats[currentBeatIndex];
-                const timeSinceBeat = positionSec - beat.start;
-                const beatDuration = beat.duration || 0.5;
+            // Also add subtle continuous response to music
+            const musicLevel = (bassEnergy + midEnergy * 0.5) / 200;
+            beatIntensity = Math.max(beatIntensity, musicLevel * 0.3);
+        }
 
-                // Create pulse effect: sharp rise, gradual fall
-                if (timeSinceBeat < beatDuration * 0.3) {
-                    beatIntensity = Math.min(1, beat.confidence * 1.5);
-                    lastBeatTime = Date.now();
-                } else {
-                    beatIntensity *= 0.85; // Decay
+        // Toggle music playback
+        function toggleMusicPlayback() {
+            if (!audioInitialized) initAudioPlayer();
+
+            const btn = document.getElementById('music-play-btn');
+            const status = document.getElementById('music-status');
+
+            if (audioElement.paused) {
+                // Resume AudioContext if suspended (browser autoplay policy)
+                if (audioContext && audioContext.state === 'suspended') {
+                    audioContext.resume();
                 }
+                audioElement.play().then(() => {
+                    if (btn) btn.textContent = '⏸️ Tạm Dừng';
+                    if (status) status.textContent = '🎵 Đang phát - Beat THẬT từ audio!';
+                    if (status) status.style.color = '#00ff7f';
+                }).catch(e => {
+                    console.log('Playback error:', e);
+                    if (status) status.textContent = '❌ Lỗi phát nhạc';
+                });
+            } else {
+                audioElement.pause();
+                if (btn) btn.textContent = '▶️ Phát Nhạc';
+                if (status) status.textContent = 'Đã tạm dừng';
+                if (status) status.style.color = '#888';
             }
         }
+
+        // Set music volume
+        function setMusicVolume(val) {
+            if (audioElement) {
+                audioElement.volume = val / 100;
+            }
+        }
+
+        // Call analyzeAudio in game loop (will be called from updateFlappy)
 
         // Override updateSpotifyUI to include beat sync
         const originalUpdateSpotifyUI = updateSpotifyUI;
@@ -2431,21 +2537,24 @@
             const settings = getGameSettings();
             const time = Date.now() / 1000;
 
+            // REAL beat detection from Web Audio API
+            if (musicSyncEnabled && isAudioPlaying) {
+                analyzeAudio(); // Analyze audio and set beatIntensity
+            }
+
             // Music beat sync - only when enabled
             let musicPulse = 0;
             let smoothBeat = 0; // Continuous smooth wave for pipe movement
             if (musicSyncEnabled) {
-                // Use Spotify beat if available, otherwise simulate beat (~120 BPM)
-                if (typeof beatIntensity !== 'undefined' && beatIntensity > 0) {
+                // Use REAL beat from audio analysis if playing, otherwise simulate
+                if (isAudioPlaying && beatIntensity > 0) {
                     musicPulse = beatIntensity;
                     smoothBeat = beatIntensity;
-                } else {
-                    // Simulated beat: SMOOTH sine wave (~120 BPM) instead of sharp pulse
-                    // Primary beat wave
-                    smoothBeat = (Math.sin(time * Math.PI * 2) + 1) / 2; // 0-1 smooth wave, 1 beat per second
-                    // Add secondary faster harmonic for more energy
-                    const fastBeat = (Math.sin(time * Math.PI * 4) + 1) / 2; // 2 beats per second
-                    musicPulse = smoothBeat * 0.7 + fastBeat * 0.3; // Blend for visual effects
+                } else if (!isAudioPlaying) {
+                    // Simulated beat only when no audio playing
+                    smoothBeat = (Math.sin(time * Math.PI * 2) + 1) / 2;
+                    const fastBeat = (Math.sin(time * Math.PI * 4) + 1) / 2;
+                    musicPulse = smoothBeat * 0.7 + fastBeat * 0.3;
                 }
             }
             // Update beat indicator bar
@@ -2466,16 +2575,31 @@
                 const p = flappyPipes[i];
                 p.x -= settings.pipeSpeed * speedMult;
 
-                // Pipes oscillate smoothly up/down with music beat - continuous sine wave
+                // Pipes oscillate smoothly up/down - LERP SMOOTHED for butter-smooth movement
                 if (musicSyncEnabled) {
-                    // Smooth sine wave oscillation based on time, each pipe has unique phase based on spawn position
-                    const pipePhase = (p.x * 0.005); // Phase offset based on pipe position
-                    const oscillation = Math.sin(time * Math.PI * 2 + pipePhase); // Smooth -1 to 1 wave
-                    // Amplitude scales with smoothBeat (0-1) for reactive movement
-                    const amplitude = 25 + smoothBeat * 20; // 25-45 pixels movement range
-                    p.musicOffset = oscillation * amplitude;
+                    // Lerp smoothedBeatForPipes toward current beat (0.08 = very smooth)
+                    const lerpFactor = 0.08;
+                    smoothedBeatForPipes += (smoothBeat - smoothedBeatForPipes) * lerpFactor;
+
+                    // Slower oscillation frequency (1.2 instead of 2) for smoother feel
+                    const pipePhase = (p.x * 0.003); // Smaller phase offset
+                    const oscillation = Math.sin(time * Math.PI * 1.2 + pipePhase);
+
+                    // Amplitude based on smoothed beat value
+                    const amplitude = 20 + smoothedBeatForPipes * 25; // 20-45 pixels
+
+                    // Target offset for this pipe
+                    const targetOffset = oscillation * amplitude;
+
+                    // Initialize smoothedOffset if not exists
+                    if (typeof p.smoothedOffset === 'undefined') p.smoothedOffset = 0;
+
+                    // Lerp the pipe's offset for extra smoothness
+                    p.smoothedOffset += (targetOffset - p.smoothedOffset) * 0.15;
+                    p.musicOffset = p.smoothedOffset;
                 } else {
                     p.musicOffset = 0;
+                    p.smoothedOffset = 0;
                 }
 
                 // Moving pipes also oscillate their own pattern
@@ -2712,10 +2836,25 @@
             // MUSIC BEAT EFFECTS - Theme-specific visual responses to beats
             let musicPulse = 0;
             if (musicSyncEnabled) {
-                if (typeof beatIntensity !== 'undefined' && beatIntensity > 0) {
+                // Use REAL beat from audio analysis
+                if (isAudioPlaying && beatIntensity > 0) {
                     musicPulse = beatIntensity;
-                } else {
-                    // Simulated beat: SMOOTH sine wave matching updateFlappy
+
+                    // SPECIAL EFFECT: Flash when REAL beat detected (strong bass hit)
+                    if (beatIntensity > 0.5) {
+                        // Create a bright flash ring at center
+                        const flashRadius = 50 + beatIntensity * 100;
+                        const flashGrad = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, flashRadius);
+                        flashGrad.addColorStop(0, `rgba(255, 255, 255, ${beatIntensity * 0.3})`);
+                        flashGrad.addColorStop(0.5, `rgba(255, 105, 180, ${beatIntensity * 0.2})`);
+                        flashGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        ctx.fillStyle = flashGrad;
+                        ctx.beginPath();
+                        ctx.arc(w / 2, h / 2, flashRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                } else if (!isAudioPlaying) {
+                    // Only use simulated beat when no audio
                     const smoothBeat = (Math.sin(time * Math.PI * 2) + 1) / 2;
                     const fastBeat = (Math.sin(time * Math.PI * 4) + 1) / 2;
                     musicPulse = smoothBeat * 0.7 + fastBeat * 0.3;
